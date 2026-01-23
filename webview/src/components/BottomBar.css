@@ -1,0 +1,32 @@
+.bottom-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+}
+
+.mode-selector {
+    display: flex;
+}
+
+.mode-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--vscode-button-border, var(--vscode-widget-border));
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mode-button:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.mode-button .codicon {
+    font-size: 10px;
+}

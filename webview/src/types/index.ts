@@ -1,0 +1,52 @@
+/**
+ * Shared types for the webview
+ * These mirror the extension types for consistency
+ */
+
+export interface ChatMessage {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: number;
+    attachments?: FileAttachment[];
+    steps?: ProgressStep[];
+}
+
+export interface FileAttachment {
+    name: string;
+    path: string;
+    size?: number;
+}
+
+export interface ProgressStep {
+    id: string;
+    label: string;
+    status: 'pending' | 'loading' | 'success' | 'error';
+}
+
+export interface ModelCategory {
+    name: string;
+    models: ModelOption[];
+}
+
+export interface ModelOption {
+    id: string;
+    name: string;
+    multiplier: string;
+    included?: boolean;
+}
+
+export interface WebviewState {
+    messages: ChatMessage[];
+    selectedModelId: string;
+    inputValue?: string;
+}
+
+/**
+ * VSCode API type
+ */
+export interface VSCodeAPI {
+    postMessage: (message: any) => void;
+    getState: () => WebviewState | undefined;
+    setState: (state: Partial<WebviewState>) => void;
+}

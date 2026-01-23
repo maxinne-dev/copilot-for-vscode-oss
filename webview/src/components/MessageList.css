@@ -1,0 +1,141 @@
+.message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.message {
+    display: flex;
+    gap: 8px;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.user-message .message-content {
+    background: var(--vscode-textBlockQuote-background);
+    border-radius: 12px;
+    padding: 10px 14px;
+    max-width: 85%;
+}
+
+.user-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.assistant-message {
+    flex-direction: column;
+}
+
+.message-avatar {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--vscode-button-background);
+    font-size: 16px;
+}
+
+.assistant-message .message-content {
+    padding-left: 32px;
+    line-height: 1.5;
+}
+
+.assistant-message .message-content p {
+    margin: 0 0 12px 0;
+}
+
+.assistant-message .message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Code blocks */
+.code-block-wrapper {
+    margin: 12px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--vscode-widget-border);
+}
+
+.code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: var(--vscode-editorGroupHeader-tabsBackground);
+    font-size: 12px;
+}
+
+.code-language {
+    color: var(--vscode-descriptionForeground);
+    text-transform: lowercase;
+}
+
+.copy-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background: transparent;
+    color: var(--vscode-foreground);
+    cursor: pointer;
+    border-radius: 4px;
+    opacity: 0.7;
+}
+
+.copy-button:hover {
+    opacity: 1;
+    background: var(--vscode-toolbar-hoverBackground);
+}
+
+.inline-code {
+    background: var(--vscode-textCodeBlock-background);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--vscode-editor-font-family);
+    font-size: 0.9em;
+}
+
+/* Streaming cursor */
+.streaming-cursor {
+    animation: blink 1s step-end infinite;
+    color: var(--vscode-editorCursor-foreground);
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Message actions */
+.message-actions {
+    display: flex;
+    gap: 4px;
+    padding-left: 32px;
+    margin-top: 8px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--vscode-descriptionForeground);
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.action-button:hover {
+    opacity: 1;
+    background: var(--vscode-toolbar-hoverBackground);
+    color: var(--vscode-foreground);
+}

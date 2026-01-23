@@ -1,0 +1,101 @@
+{
+  "name": "copilot-for-vscode-oss",
+  "displayName": "Copilot for VSCode OSS",
+  "description": "Copilot for VSCode OSS using GitHub Copilot SDK integration",
+  "version": "0.1.0",
+  "publisher": "maxie.homri.ch",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/copilot-for-oss.git"
+  },
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning",
+    "Chat"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "copilot-chat-container",
+          "title": "Copilot",
+          "icon": "media/chat-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "copilot-chat-container": [
+        {
+          "type": "webview",
+          "id": "copilot-oss.sidebar",
+          "name": "Chat",
+          "icon": "media/chat-icon.svg"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Copilot for VSCode OSS",
+      "properties": {
+        "copilot-oss.defaultModel": {
+          "type": "string",
+          "default": "gpt-4.1",
+          "description": "Default AI model for new chat sessions"
+        },
+        "copilot-oss.apiProvider": {
+          "type": "string",
+          "enum": [
+            "copilot",
+            "openai",
+            "anthropic",
+            "google",
+            "local"
+          ],
+          "default": "copilot",
+          "description": "AI provider to use for chat completions"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "copilot-oss.newSession",
+        "title": "New Chat Session",
+        "icon": "$(add)"
+      },
+      {
+        "command": "copilot-oss.clearHistory",
+        "title": "Clear Chat History",
+        "icon": "$(clear-all)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "npm run compile:extension && npm run compile:webview",
+    "compile:extension": "tsc -p ./tsconfig.json",
+    "compile:webview": "npm run --prefix webview build",
+    "watch": "tsc -watch -p ./tsconfig.json",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "dev": "concurrently \"npm run watch\" \"npm run --prefix webview dev\""
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^7.x",
+    "@typescript-eslint/parser": "^7.x",
+    "@vscode/test-electron": "^2.x",
+    "concurrently": "^8.x",
+    "eslint": "^8.x",
+    "typescript": "^5.x"
+  },
+  "dependencies": {
+    "@github/copilot-sdk": "^0.1.x",
+    "@vscode/codicons": "^0.0.36"
+  }
+}

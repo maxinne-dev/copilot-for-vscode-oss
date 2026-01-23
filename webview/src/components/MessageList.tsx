@@ -1,0 +1,112 @@
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import type { ChatMessage } from '../types';
+import './MessageList.css';
+
+interface MessageListProps {
+    messages: ChatMessage[];
+    streamingMessageId: string | null;
+}
+
+export default function MessageList({ messages, streamingMessageId }: MessageListProps) {
+    return (
+        <div className="message-list">
+            {messages.map((message) => (
+                <MessageItem
+                    key={message.id}
+                    message={message}
+                    isStreaming={message.id === streamingMessageId}
+                />
+            ))}
+        </div>
+    );
+}
+
+interface MessageItemProps {
+    message: ChatMessage;
+    isStreaming: boolean;
+}
+
+function MessageItem({ message, isStreaming }: MessageItemProps) {
+    const isUser = message.role === 'user';
+
+    return (
+        <div className={`message ${isUser ? 'user-message' : 'assistant-message'}`}>
+            {!isUser && (
+                <div className="message-avatar">
+                    <i className="codicon codicon-sparkle"></i>
+                </div>
+            )}
+            <div className="message-content">
+                {isUser ? (
+                    <div className="user-text">{message.content}</div>
+                ) : (
+                    <>
+                        <ReactMarkdown
+                            components={{
+                                code({ node, className, children, ...props }) {
+                                    const match = /language-(\w+)/.exec(className || '');
+                                    const codeString = String(children).replace(/\n$/, '');
+
+                                    if (match) {
+                                        return (
+                                            <div className="code-block-wrapper">
+                                                <div className="code-block-header">
+                                                    <span className="code-language">{match[1]}</span>
+                                                    <button
+                                                        className="copy-button"
+                                                        onClick={() => navigator.clipboard.writeText(codeString)}
+                                                        title="Copy code"
+                                                    >
+                                                        <i className="codicon codicon-copy"></i>
+                                                    </button>
+                                                </div>
+                                                <SyntaxHighlighter
+                                                    style={vscDarkPlus}
+                                                    language={match[1]}
+                                                    PreTag="div"
+                                                    customStyle={{
+                                                        margin: 0,
+                                                        borderRadius: '0 0 4px 4px',
+                                                        background: 'var(--vscode-editor-background)'
+                                                    }}
+                                                >
+                                                    {codeString}
+                                                </SyntaxHighlighter>
+                                            </div>
+                                        );
+                                    }
+
+                                    return (
+                                        <code className="inline-code" {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                }
+                            }}
+                        >
+                            {message.content}
+                        </ReactMarkdown>
+                        {isStreaming && (
+                            <span className="streaming-cursor">▌</span>
+                        )}
+                    </>
+                )}
+            </div>
+            {!isUser && !isStreaming && (
+                <div className="message-actions">
+                    <button className="action-button" title="Copy">
+                        <i className="codicon codicon-copy"></i>
+                    </button>
+                    <button className="action-button" title="Good response">
+                        <i className="codicon codicon-thumbsup"></i>
+                    </button>
+                    <button className="action-button" title="Bad response">
+                        <i className="codicon codicon-thumbsdown"></i>
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}

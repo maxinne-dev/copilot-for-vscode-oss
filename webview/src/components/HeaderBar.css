@@ -1,0 +1,46 @@
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--vscode-widget-border);
+    min-height: 40px;
+}
+
+.session-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--vscode-foreground);
+}
+
+.header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: var(--vscode-foreground);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.icon-button:hover {
+    background: var(--vscode-toolbar-hoverBackground);
+}
+
+.icon-button:active {
+    background: var(--vscode-toolbar-activeBackground);
+}
+
+.icon-button:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+}

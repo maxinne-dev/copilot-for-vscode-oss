@@ -1,0 +1,112 @@
+.model-selector {
+    position: relative;
+}
+
+.model-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--vscode-button-border, var(--vscode-widget-border));
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.model-trigger:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.model-trigger .codicon {
+    font-size: 10px;
+}
+
+.model-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 4px;
+    min-width: 280px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: var(--vscode-dropdown-background);
+    border: 1px solid var(--vscode-dropdown-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.model-category {
+    padding: 4px 0;
+}
+
+.model-category:not(:last-child) {
+    border-bottom: 1px solid var(--vscode-widget-border);
+}
+
+.category-header {
+    padding: 8px 12px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--vscode-descriptionForeground);
+    letter-spacing: 0.5px;
+}
+
+.model-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--vscode-dropdown-foreground);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.model-option:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.model-option.selected {
+    background: var(--vscode-list-activeSelectionBackground);
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+.model-name {
+    font-weight: 400;
+}
+
+.model-multiplier {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.model-multiplier.included {
+    color: var(--vscode-testing-iconPassed);
+}
+
+.dropdown-footer {
+    padding: 8px 12px;
+    border-top: 1px solid var(--vscode-widget-border);
+}
+
+.manage-models-link {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--vscode-textLink-foreground);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.manage-models-link:hover {
+    text-decoration: underline;
+}
