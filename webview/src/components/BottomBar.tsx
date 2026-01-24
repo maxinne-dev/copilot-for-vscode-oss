@@ -1,32 +1,47 @@
 import ModelSelector from './ModelSelector';
-import type { ModelCategory } from '../types';
+import ContextUsageIndicator from './ContextUsageIndicator';
+import type { ModelCategory, ContextUsageInfo } from '../types';
 import './BottomBar.css';
 
 interface BottomBarProps {
     models: ModelCategory[];
     selectedModelId: string;
+    modelsLoading: boolean;
+    modelsError: string | null;
     onModelChange: (modelId: string) => void;
+    onRequestModels: () => void;
+    contextUsage: ContextUsageInfo | null;
 }
 
 export default function BottomBar({
     models,
     selectedModelId,
-    onModelChange
+    modelsLoading,
+    modelsError,
+    onModelChange,
+    onRequestModels,
+    contextUsage
 }: BottomBarProps) {
     return (
         <div className="bottom-bar">
-            <div className="mode-selector">
-                <button className="mode-button">
-                    <span>Ask</span>
-                    <i className="codicon codicon-chevron-down"></i>
+            {/* <div className="attach-button-container">
+                <button className="attach-button" title="Attach files">
+                    <i className="codicon codicon-attach"></i>
                 </button>
-            </div>
+            </div> */}
 
             <ModelSelector
                 models={models}
                 selectedModelId={selectedModelId}
+                modelsLoading={modelsLoading}
+                modelsError={modelsError}
                 onModelChange={onModelChange}
+                onRequestModels={onRequestModels}
             />
+
+            <div className="bottom-bar-spacer" />
+
+            <ContextUsageIndicator usage={contextUsage} />
         </div>
     );
 }

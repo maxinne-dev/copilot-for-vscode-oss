@@ -1,20 +1,29 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ModelCategory } from '../types';
 import './ModelSelector.css';
 
 interface ModelSelectorProps {
     models: ModelCategory[];
     selectedModelId: string;
+    modelsLoading: boolean;
+    modelsError: string | null;
     onModelChange: (modelId: string) => void;
+    onRequestModels: () => void;
 }
 
 export default function ModelSelector({
     models,
     selectedModelId,
-    onModelChange
+    modelsLoading,
+    modelsError,
+    onModelChange,
+    onRequestModels
 }: ModelSelectorProps) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const hasRequestedModels = useRef(false);
 
     // Find selected model name
     const selectedModel = models
@@ -49,16 +58,31 @@ export default function ModelSelector({
         return () => document.removeEventListener('keydown', handleEscape);
     }, [isOpen]);
 
+    const handleToggle = () => {
+        const newIsOpen = !isOpen;
+        setIsOpen(newIsOpen);
+
+        // Request models when opening dropdown (on demand)
+        if (newIsOpen && !hasRequestedModels.current) {
+            hasRequestedModels.current = true;
+            onRequestModels();
+        }
+    };
+
     const handleSelect = (modelId: string) => {
         onModelChange(modelId);
         setIsOpen(false);
+    };
+
+    const handleRetry = () => {
+        onRequestModels();
     };
 
     return (
         <div className="model-selector" ref={containerRef}>
             <button
                 className="model-trigger"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={handleToggle}
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
             >
@@ -68,31 +92,55 @@ export default function ModelSelector({
 
             {isOpen && (
                 <div className="model-dropdown" role="listbox">
-                    {models.map((category) => (
-                        <div key={category.name} className="model-category">
-                            <div className="category-header">{category.name}</div>
-                            {category.models.map((model) => (
-                                <button
-                                    key={model.id}
-                                    className={`model-option ${model.id === selectedModelId ? 'selected' : ''}`}
-                                    onClick={() => handleSelect(model.id)}
-                                    role="option"
-                                    aria-selected={model.id === selectedModelId}
-                                >
-                                    <span className="model-name">{model.name}</span>
-                                    <span className={`model-multiplier ${model.included ? 'included' : ''}`}>
-                                        {model.included ? 'included' : model.multiplier}
-                                    </span>
-                                </button>
-                            ))}
+                    {modelsLoading ? (
+                        <div className="models-loading">
+                            <i className="codicon codicon-loading codicon-modifier-spin"></i>
+                            <span>{t('model.loadingModels')}</span>
                         </div>
-                    ))}
-
-                    <div className="dropdown-footer">
-                        <button className="manage-models-link">
-                            Manage models...
-                        </button>
-                    </div>
+                    ) : modelsError ? (
+                        <div className="models-error">
+                            <i className="codicon codicon-error"></i>
+                            <span>{modelsError}</span>
+                            <button className="retry-button" onClick={handleRetry}>
+                                <i className="codicon codicon-refresh"></i>
+                                {t('model.retry')}
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            {models.map((category) => (
+                                <div key={category.name} className="model-category">
+                                    <div className="category-header">{category.name}</div>
+                                    {category.models.map((model) => {
+                                        const isDisabled = model.isEnabled === false;
+                                        return (
+                                            <button
+                                                key={model.id}
+                                                className={`model-option ${model.id === selectedModelId ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                                                onClick={() => !isDisabled && handleSelect(model.id)}
+                                                role="option"
+                                                aria-selected={model.id === selectedModelId}
+                                                aria-disabled={isDisabled}
+                                                title={isDisabled ? t('model.modelDisabled') : undefined}
+                                            >
+                                                <span className="model-name">{model.name}</span>
+                                                <span className="model-meta">
+                                                    {model.supportsVision && (
+                                                        <i className="codicon codicon-eye model-vision-icon" title={t('model.supportsVision')}></i>
+                                                    )}
+                                                    {model.multiplier && (
+                                                        <span className={`model-multiplier ${model.included ? 'included' : ''}`}>
+                                                            {model.included ? t('model.included') : model.multiplier}
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </>
+                    )}
                 </div>
             )}
         </div>

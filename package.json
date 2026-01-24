@@ -2,29 +2,38 @@
   "name": "copilot-for-vscode-oss",
   "displayName": "Copilot for VSCode OSS",
   "description": "Copilot for VSCode OSS using GitHub Copilot SDK integration",
-  "version": "0.1.0",
-  "publisher": "maxie.homri.ch",
-  "license": "MIT",
+  "version": "1.0.0",
+  "author": {
+    "name": "Maxie Homrich",
+    "url": "https://github.com/maxinne-dev"
+  },
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/copilot-for-oss.git"
+    "url": "https://github.com/maxinne-dev/copilot-for-vscode-oss"
   },
   "engines": {
-    "vscode": "^1.104.0"
+    "vscode": "^1.103.0"
   },
   "categories": [
     "Other",
     "Machine Learning",
     "Chat"
   ],
+  "activationEvents": [
+    "onView:copilot-oss.sidebar",
+    "onCommand:copilot-oss.newSession",
+    "onCommand:copilot-oss.clearHistory"
+  ],
   "main": "./dist/extension.js",
+  "l10n": "./locales",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
           "id": "copilot-chat-container",
-          "title": "Copilot",
-          "icon": "media/chat-icon.svg"
+          "title": "%viewsContainers.title%",
+          "icon": "media/ghcp.svg"
         }
       ]
     },
@@ -33,8 +42,8 @@
         {
           "type": "webview",
           "id": "copilot-oss.sidebar",
-          "name": "Chat",
-          "icon": "media/chat-icon.svg"
+          "name": "%views.chat.name%",
+          "icon": "media/ghcp.svg"
         }
       ]
     },
@@ -44,31 +53,19 @@
         "copilot-oss.defaultModel": {
           "type": "string",
           "default": "gpt-4.1",
-          "description": "Default AI model for new chat sessions"
-        },
-        "copilot-oss.apiProvider": {
-          "type": "string",
-          "enum": [
-            "copilot",
-            "openai",
-            "anthropic",
-            "google",
-            "local"
-          ],
-          "default": "copilot",
-          "description": "AI provider to use for chat completions"
+          "description": "%config.defaultModel.description%"
         }
       }
     },
     "commands": [
       {
         "command": "copilot-oss.newSession",
-        "title": "New Chat Session",
+        "title": "%command.newSession.title%",
         "icon": "$(add)"
       },
       {
         "command": "copilot-oss.clearHistory",
-        "title": "Clear Chat History",
+        "title": "%command.clearHistory.title%",
         "icon": "$(clear-all)"
       }
     ]
@@ -86,7 +83,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.x",
-    "@types/vscode": "^1.104.0",
+    "@types/vscode": "^1.103.0",
     "@typescript-eslint/eslint-plugin": "^7.x",
     "@typescript-eslint/parser": "^7.x",
     "@vscode/test-electron": "^2.x",
@@ -96,6 +93,6 @@
   },
   "dependencies": {
     "@github/copilot-sdk": "^0.1.x",
-    "@vscode/codicons": "^0.0.36"
+    "@vscode/codicons": "^0.0.44"
   }
 }

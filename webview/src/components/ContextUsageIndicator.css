@@ -1,0 +1,74 @@
+.context-usage-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: default;
+    transition: background-color 0.15s ease;
+    white-space: pre-line;
+}
+
+.context-usage-indicator:hover {
+    background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+/* No data state */
+.context-usage-indicator.no-data {
+    opacity: 0.6;
+}
+
+.context-usage-indicator.no-data .context-usage-text {
+    color: var(--vscode-descriptionForeground);
+}
+
+/* Normal usage (< 50%) - inherits theme text color */
+.context-usage-indicator.usage-normal .context-usage-text {
+    color: var(--vscode-foreground);
+}
+
+.context-usage-indicator.usage-normal .chart-background {
+    stroke: var(--vscode-editorWidget-border, rgba(128, 128, 128, 0.3));
+}
+
+.context-usage-indicator.usage-normal .chart-progress {
+    stroke: var(--vscode-foreground);
+}
+
+/* Warning usage (50-80%) - yellow/amber with transparency */
+.context-usage-indicator.usage-warning .context-usage-text {
+    color: rgba(255, 193, 7, 0.9);
+}
+
+.context-usage-indicator.usage-warning .chart-background {
+    stroke: rgba(255, 193, 7, 0.2);
+}
+
+.context-usage-indicator.usage-warning .chart-progress {
+    stroke: rgba(255, 193, 7, 0.85);
+}
+
+/* Critical usage (> 80%) - red with transparency */
+.context-usage-indicator.usage-critical .context-usage-text {
+    color: rgba(244, 67, 54, 0.9);
+}
+
+.context-usage-indicator.usage-critical .chart-background {
+    stroke: rgba(244, 67, 54, 0.2);
+}
+
+.context-usage-indicator.usage-critical .chart-progress {
+    stroke: rgba(244, 67, 54, 0.85);
+}
+
+/* SVG chart styling */
+.context-usage-chart {
+    flex-shrink: 0;
+}
+
+.context-usage-text {
+    font-family: var(--vscode-font-family);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}

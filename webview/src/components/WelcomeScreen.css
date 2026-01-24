@@ -1,0 +1,178 @@
+.welcome-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.welcome-header {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--vscode-descriptionForeground);
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+/* Loading State */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.codicon-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--vscode-descriptionForeground);
+    margin: 0 0 20px 0;
+}
+
+.new-chat-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.new-chat-button:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+/* Session Sections */
+.session-section {
+    margin-bottom: 20px;
+}
+
+.section-header {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--vscode-descriptionForeground);
+    margin: 0 0 8px 0;
+    padding: 0;
+}
+
+.session-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.session-item {
+    margin: 0;
+    padding: 0;
+}
+
+.session-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--vscode-foreground);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.session-button:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.session-button:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+}
+
+.session-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 12px;
+}
+
+.session-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.session-time {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.session-copy-icon {
+    font-size: 14px;
+    color: var(--vscode-descriptionForeground);
+    opacity: 0;
+    transition: opacity 0.1s ease;
+}
+
+.session-button:hover .session-copy-icon {
+    opacity: 1;
+}
+
+/* Show More Button */
+.show-more-button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 4px;
+    background: transparent;
+    border: none;
+    color: var(--vscode-textLink-foreground);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.show-more-button:hover {
+    text-decoration: underline;
+}

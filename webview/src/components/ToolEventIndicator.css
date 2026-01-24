@@ -1,0 +1,75 @@
+.tool-event-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.tool-event-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.tool-event-icon .codicon {
+    font-size: 12px;
+}
+
+/* Spinning animation for loading state */
+.codicon-modifier-spin {
+    animation: codicon-spin 1s linear infinite;
+}
+
+@keyframes codicon-spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Status colors */
+.tool-event-indicator .status-success {
+    color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.tool-event-indicator .status-error {
+    color: var(--vscode-testing-iconFailed, #f14c4c);
+}
+
+.tool-event-indicator.loading .tool-event-icon {
+    color: var(--vscode-descriptionForeground);
+}
+
+.tool-event-label {
+    color: var(--vscode-foreground);
+    font-weight: 400;
+}
+
+.tool-event-indicator.loading .tool-event-label {
+    color: var(--vscode-descriptionForeground);
+}
+
+.tool-event-details {
+    color: var(--vscode-descriptionForeground);
+    font-size: 11px;
+    margin-left: 2px;
+}
+
+/* Container for multiple events */
+.tool-events-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    padding: 6px 0;
+    border-left: 2px solid var(--vscode-textBlockQuote-border, #007acc);
+    padding-left: 10px;
+    margin-left: 4px;
+}
+
+.tool-events-container:empty {
+    display: none;
+}

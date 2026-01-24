@@ -3,30 +3,73 @@
  */
 export type ClientMessage =
     | { type: 'ready' }
-    | { type: 'sendMessage'; message: string; modelId: string; attachments: string[] }
+    | { type: 'sendMessage'; message: string; modelId: string; attachments: FileAttachment[]; systemMessage?: string }
     | { type: 'stopGeneration' }
     | { type: 'requestFileAttachment' }
     | { type: 'removeAttachment'; path: string }
+    | { type: 'requestDirectoryAttachment' }
     | { type: 'selectModel'; modelId: string }
+    | { type: 'requestModels' }
     | { type: 'newChat' }
-    | { type: 'openSettings' };
+    | { type: 'openSettings' }
+    | { type: 'requestSessions' }
+    | { type: 'resumeSession'; sessionId: string; modelId?: string };
+
+/**
+ * Context usage information from session
+ */
+export interface ContextUsageInfo {
+    tokenLimit: number;       // Max context window tokens
+    currentTokens: number;    // Tokens currently used
+    messagesLength: number;   // Number of messages in context
+    percentage: number;       // Pre-calculated percentage (0-100)
+}
+
+/**
+ * Reasoning block for AI thinking/reasoning display
+ */
+export interface ReasoningBlock {
+    reasoningId: string;
+    content: string;           // Full/accumulated reasoning text
+    isComplete: boolean;       // True when reasoning is finished
+}
 
 /**
  * Message types sent from Extension Host to Webview
  */
 export type ServerMessage =
-    | { type: 'init'; models: ModelCategory[]; history: ChatMessage[]; defaultModel?: string }
-    | { type: 'addMessage'; id: string; role: 'user' | 'assistant'; content: string }
+    | { type: 'init'; models: ModelCategory[]; history: ChatMessage[]; defaultModel?: string; locale: string }
+    | { type: 'addMessage'; id: string; role: 'user' | 'assistant'; content: string; model?: string }
     | { type: 'streamChunk'; messageId: string; content: string }
     | { type: 'streamEnd'; messageId: string }
+    | { type: 'reasoningDelta'; messageId: string; reasoningId: string; deltaContent: string }
+    | { type: 'reasoningComplete'; messageId: string; reasoningId: string; content: string }
     | { type: 'statusUpdate'; messageId: string; step: ProgressStep }
+    | { type: 'toolEvent'; messageId: string; event: ToolEvent }
     | { type: 'attachmentSelected'; files: FileAttachment[] }
     | { type: 'usageUpdate'; tokens: number; cost?: number }
+    | { type: 'contextUsageUpdate'; usage: ContextUsageInfo }
     | { type: 'modelChanged'; modelId: string }
+    | { type: 'modelsLoaded'; models: ModelOption[]; categories?: ModelCategory[] }
+    | { type: 'modelsError'; message: string }
     | { type: 'error'; message: string }
     | { type: 'generationComplete' }
     | { type: 'clearHistory' }
-    | { type: 'viewVisible' };
+    | { type: 'viewVisible' }
+    | { type: 'sessionsLoaded'; recentSessions: SessionMetadata[]; otherSessions: SessionMetadata[] }
+    | { type: 'sessionResumed'; sessionId: string; messages: ChatMessage[] }
+    | { type: 'accessDenied'; reason: string };
+
+/**
+ * Session metadata from Copilot SDK
+ */
+export interface SessionMetadata {
+    sessionId: string;
+    startTime: Date;
+    modifiedTime: Date;
+    summary?: string;
+    isRemote: boolean;
+}
 
 /**
  * Chat message structure
@@ -36,8 +79,11 @@ export interface ChatMessage {
     role: 'user' | 'assistant';
     content: string;
     timestamp: number;
+    model?: string;
     attachments?: FileAttachment[];
     steps?: ProgressStep[];
+    toolEvents?: ToolEvent[];
+    reasoning?: ReasoningBlock;
 }
 
 /**
@@ -46,6 +92,7 @@ export interface ChatMessage {
 export interface FileAttachment {
     name: string;
     path: string;
+    type: 'file' | 'directory';
     size?: number;
 }
 
@@ -56,6 +103,19 @@ export interface ProgressStep {
     id: string;
     label: string;
     status: 'pending' | 'loading' | 'success' | 'error';
+}
+
+/**
+ * Tool execution event for inline display
+ */
+export interface ToolEvent {
+    id: string;
+    toolCallId: string;
+    toolName: string;
+    status: 'loading' | 'success' | 'error';
+    label: string;           // Human-readable description (e.g., "Read utils.ts")
+    details?: string;        // Additional info (e.g., "45 lines read")
+    timestamp: number;
 }
 
 /**
@@ -74,6 +134,10 @@ export interface ModelOption {
     name: string;
     multiplier: string;
     included?: boolean;
+    isPremium?: boolean;         // From billing.is_premium
+    supportsVision?: boolean;    // From capabilities.supports.vision
+    isEnabled?: boolean;         // From policy.state === 'enabled'
+    restrictedTo?: string[];     // From billing.restricted_to
 }
 
 /**

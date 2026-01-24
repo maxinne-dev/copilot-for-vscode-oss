@@ -1,0 +1,126 @@
+.reasoning-block {
+    margin-bottom: 12px;
+    border-left: 2px solid var(--vscode-textBlockQuote-border, #007acc);
+    padding-left: 10px;
+    margin-left: 4px;
+}
+
+/* Streaming state */
+.reasoning-block.streaming .reasoning-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.reasoning-icon {
+    font-size: 12px;
+}
+
+/* Spinning animation for loading state */
+.codicon-modifier-spin {
+    animation: codicon-spin 1s linear infinite;
+}
+
+@keyframes codicon-spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.reasoning-label {
+    font-weight: 500;
+}
+
+/* Streaming content - max 5 lines visible with scroll */
+.reasoning-content.streaming-content {
+    max-height: calc(5 * 1.5em);
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--vscode-descriptionForeground);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 4px 0;
+    /* Subtle scrollbar */
+    scrollbar-width: thin;
+}
+
+.reasoning-content.streaming-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.reasoning-content.streaming-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reasoning-content.streaming-content::-webkit-scrollbar-thumb {
+    background: var(--vscode-scrollbarSlider-background);
+    border-radius: 2px;
+}
+
+/* Collapsed state */
+.reasoning-block.collapsed {
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.reasoning-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--vscode-widget-border, rgba(128, 128, 128, 0.35));
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    width: fit-content;
+    transition: background-color 0.15s ease;
+}
+
+.reasoning-toggle:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.reasoning-toggle .reasoning-icon {
+    color: var(--vscode-textLink-foreground, #3794ff);
+}
+
+.reasoning-chevron {
+    font-size: 10px;
+    margin-left: 2px;
+}
+
+/* Expanded content */
+.reasoning-content.expanded {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--vscode-descriptionForeground);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.reasoning-content.expanded::-webkit-scrollbar {
+    width: 4px;
+}
+
+.reasoning-content.expanded::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reasoning-content.expanded::-webkit-scrollbar-thumb {
+    background: var(--vscode-scrollbarSlider-background);
+    border-radius: 2px;
+}

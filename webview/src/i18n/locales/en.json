@@ -1,0 +1,76 @@
+{
+    "header": {
+        "title": "Copilot for OSS",
+        "history": "Chat history",
+        "newChat": "New chat"
+    },
+    "input": {
+        "placeholder": "Edit files in your workspace in agent mode",
+        "attach": "Attach",
+        "attachFolder": "Attach Folder",
+        "directory": "Directory",
+        "files": "Files",
+        "removeAttachment": "Remove attachment",
+        "stopGeneration": "Stop generation",
+        "sendMessage": "Send message",
+        "systemMessageActive": "Custom system message",
+        "systemMessageDisabled": "System message can only be set before starting a chat"
+    },
+    "chat": {
+        "welcome": "How can I help you?",
+        "disclaimer": "I'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions."
+    },
+    "welcome": {
+        "selectConversation": "Select a conversation",
+        "loadingSessions": "Loading sessions...",
+        "noPreviousConversations": "No previous conversations",
+        "startNewChat": "Start a new chat",
+        "recent": "Recent",
+        "otherConversations": "Other Conversations",
+        "showMore": "Show {{count}} more...",
+        "copy": "Copy",
+        "session": "Session {{id}}..."
+    },
+    "time": {
+        "justNow": "just now",
+        "minutesAgo": "{{count}} min ago",
+        "minutesAgo_plural": "{{count}} mins ago",
+        "hoursAgo": "{{count}} hr ago",
+        "hoursAgo_plural": "{{count}} hrs ago",
+        "daysAgo": "{{count}} day ago",
+        "daysAgo_plural": "{{count}} days ago",
+        "weeksAgo": "{{count}} wk ago",
+        "weeksAgo_plural": "{{count}} wks ago"
+    },
+    "model": {
+        "loadingModels": "Loading models...",
+        "retry": "Retry",
+        "included": "included",
+        "supportsVision": "Supports vision",
+        "modelDisabled": "This model is not enabled for your account"
+    },
+    "context": {
+        "noData": "No context data",
+        "used": "{{percentage}}% used",
+        "tooltip": "Context Usage: {{percentage}}%\n{{current}} / {{limit}} tokens\n{{messages}} messages"
+    },
+    "reasoning": {
+        "thinking": "Thinking...",
+        "thoughtForAMoment": "Thought for a moment"
+    },
+    "modal": {
+        "customSystemMessage": "Custom System Message",
+        "placeholder": "Enter custom instructions for the AI assistant...",
+        "cancel": "Cancel",
+        "apply": "Apply"
+    },
+    "access": {
+        "denied": "Access Denied",
+        "message": "Due to internal policies, the user's company is not licensed to use the extension.",
+        "contactInfo": "Please contact the author if you want more information."
+    },
+    "message": {
+        "copy": "Copy",
+        "copyCode": "Copy code"
+    }
+}

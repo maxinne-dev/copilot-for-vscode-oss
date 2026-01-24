@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import type { FileAttachment } from '../types';
 import './InputArea.css';
@@ -6,27 +7,53 @@ import './InputArea.css';
 interface InputAreaProps {
     attachments: FileAttachment[];
     isGenerating: boolean;
+    hasMessages: boolean;
     onSend: (content: string) => void;
     onStop: () => void;
     onAttach: () => void;
+    onAttachFolder: () => void;
     onRemoveAttachment: (path: string) => void;
+    onSystemMessageClick: () => void;
 }
 
 export default function InputArea({
     attachments,
     isGenerating,
+    hasMessages,
     onSend,
     onStop,
     onAttach,
-    onRemoveAttachment
+    onAttachFolder,
+    onRemoveAttachment,
+    onSystemMessageClick
 }: InputAreaProps) {
+    const { t } = useTranslation();
     const [input, setInput] = useState('');
+    const [showAttachDropdown, setShowAttachDropdown] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const attachDropdownRef = useRef<HTMLDivElement>(null);
 
     // Focus textarea on mount
     useEffect(() => {
         textareaRef.current?.focus();
     }, []);
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (attachDropdownRef.current && !attachDropdownRef.current.contains(event.target as Node)) {
+                setShowAttachDropdown(false);
+            }
+        };
+
+        if (showAttachDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showAttachDropdown]);
 
     const handleSubmit = () => {
         const trimmed = input.trim();
@@ -43,6 +70,16 @@ export default function InputArea({
         }
     };
 
+    const handleAttachDirectory = () => {
+        setShowAttachDropdown(false);
+        onAttachFolder();
+    };
+
+    const handleAttachFiles = () => {
+        setShowAttachDropdown(false);
+        onAttach();
+    };
+
     const canSend = input.trim().length > 0 && !isGenerating;
 
     return (
@@ -51,12 +88,12 @@ export default function InputArea({
                 <div className="attachments-bar">
                     {attachments.map((file) => (
                         <div key={file.path} className="attachment-chip">
-                            <i className="codicon codicon-file"></i>
+                            <i className={`codicon ${file.type === 'directory' ? 'codicon-folder' : 'codicon-file'}`}></i>
                             <span className="attachment-name">{file.name}</span>
                             <button
                                 className="remove-attachment"
                                 onClick={() => onRemoveAttachment(file.path)}
-                                title="Remove attachment"
+                                title={t('input.removeAttachment')}
                             >
                                 <i className="codicon codicon-close"></i>
                             </button>
@@ -69,7 +106,7 @@ export default function InputArea({
                 <TextareaAutosize
                     ref={textareaRef}
                     className="message-input"
-                    placeholder="Edit files in your workspace in agent mode"
+                    placeholder={t('input.placeholder')}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -79,20 +116,45 @@ export default function InputArea({
                 />
 
                 <div className="input-actions">
+                    {/* System message button - only enabled for new sessions */}
                     <button
                         className="attach-button"
-                        onClick={onAttach}
-                        title="Attach file"
-                        disabled={isGenerating}
+                        onClick={onSystemMessageClick}
+                        title={hasMessages ? t('input.systemMessageDisabled') : t('input.systemMessageActive')}
+                        disabled={isGenerating || hasMessages}
                     >
-                        <i className="codicon codicon-attach"></i>
+                        <i className="codicon codicon-comment-discussion-sparkle"></i>
                     </button>
+
+                    <div className="attach-dropdown-container" ref={attachDropdownRef}>
+                        <button
+                            className="attach-button"
+                            onClick={() => setShowAttachDropdown(!showAttachDropdown)}
+                            title={t('input.attach')}
+                            disabled={isGenerating}
+                        >
+                            <i className="codicon codicon-attach"></i>
+                        </button>
+
+                        {showAttachDropdown && (
+                            <div className="attach-dropdown">
+                                <button className="attach-dropdown-item" onClick={handleAttachDirectory}>
+                                    <i className="codicon codicon-folder"></i>
+                                    <span>{t('input.directory')}</span>
+                                </button>
+                                <button className="attach-dropdown-item" onClick={handleAttachFiles}>
+                                    <i className="codicon codicon-file"></i>
+                                    <span>{t('input.files')}</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {isGenerating ? (
                         <button
                             className="send-button stop"
                             onClick={onStop}
-                            title="Stop generation"
+                            title={t('input.stopGeneration')}
                         >
                             <i className="codicon codicon-primitive-square"></i>
                         </button>
@@ -101,7 +163,7 @@ export default function InputArea({
                             className={`send-button ${canSend ? 'active' : ''}`}
                             onClick={handleSubmit}
                             disabled={!canSend}
-                            title="Send message"
+                            title={t('input.sendMessage')}
                         >
                             <i className="codicon codicon-send"></i>
                         </button>

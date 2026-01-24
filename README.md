@@ -1,115 +1,107 @@
-# AI Chat Plugin for VSCode OSS
+# Copilot for VS Code OSS
 
-An AI chat plugin for Visual Studio Code OSS 1.104.0 that provides a sidebar-based conversational interface with AI models using the GitHub Copilot SDK.
+![Copilot for VS Code OSS](static/cover.png)
 
-## Features
+<div align="center">
 
-- **Sidebar Integration**: Activity bar icon to open the chat panel
-- **Chat Interface**: Full-featured message history with markdown rendering
-- **Auto-expanding Input**: Smart textarea that grows with content
-- **Model Selection**: Dropdown to switch between AI models
-- **File Attachments**: Attach workspace files as context
-- **Streaming Responses**: Real-time token streaming with visual feedback
-- **Theme Support**: Automatic adaptation to VS Code themes
+[![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](package.json)
 
-## Requirements
+**A simplified GitHub Copilot experience, unbundled.**
 
-- Visual Studio Code OSS 1.104.0 or higher
-- Node.js 18+
-- GitHub Copilot subscription (for SDK integration)
-- Copilot CLI installed (`copilot --version`)
+</div>
 
-## Getting Started
+---
 
-### Installation
+**Copilot for VS Code OSS** brings the power of GitHub Copilot to your favorite open-source editors. Whether you use **VS Code OSS**, **VSCodium**, **Cursor**, **Windsurf**, **Trae**, or **Google Antigravity**, this extension provides a premium, native-feeling AI chat interface powered by the official GitHub Copilot SDK.
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd copilot-for-vscode-oss
-   ```
+Run the same agentic engine behind the Copilot CLI directly in your sidebar—handling planning, tool invocation, and multi-model support with ease.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   cd webview && npm install && cd ..
-   ```
+## ✨ Features
 
-3. Build the extension:
-   ```bash
-   npm run compile
-   ```
+- **🤖 Multi-Model Support**: Switch seamlessly between top-tier models like **GPT-4**, **Claude 3.5 Sonnet**, and others available via your Copilot subscription.
+- **💬 Native Chat Experience**: A meticulously crafted UI that follows VS Code's design guidelines. It looks and feels like it belongs in your editor.
+- **📎 Context-Aware**: Attach workspace files to your prompts. The agent understands your code structure and dependencies.
+- **⚡ Streaming Responses**: Real-time token streaming with visual progress indicators for "thinking" and tool execution steps.
+- **🛠️ Agentic Capabilities**: Powered by the **@github/copilot-sdk**, the agent can plan complex tasks, edit files, and run commands (coming soon).
+- **🔒 Secure & Private**: Uses your own GitHub Copilot subscription. Your code stays between you and GitHub.
 
-### Development
+## 🚀 Tested Environments
 
-Run in development mode with hot reloading:
+This extension is designed to be universal. It has been tested and verified on:
 
+- **Visual Studio Code** (Official)
+- **VSCodium** (Open Source)
+- **Cursor** (AI Editor)
+- **Windsurf**
+- **Trae**
+- **Kiro**
+- **Google Antigravity**
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have the following secure environment:
+
+1.  **Node.js 18+**: Required to run the extension backend.
+2.  **GitHub Copilot Subscription**: You need an active subscription (Individual, Business, or Enterprise).
+3.  **Copilot CLI**: The extension relies on the `github-copilot-cli` for authentication and model access.
+    ```bash
+    # Install via npm
+    npm install -g @githubnext/github-copilot-cli
+
+    # Authenticate
+    github-copilot-cli auth
+    ```
+
+## 📦 Installation
+
+### From Marketplace (Coming Soon)
+Search for `Copilot for VS Code OSS` in your editor's extension marketplace.
+
+### Manual Installation (VSIX)
+1.  Download the latest `.vsix` release from the [Releases](https://github.com/yourusername/copilot-vscode-oss/releases) page.
+2.  In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
+3.  Type `Extensions: Install from VSIX...` and select the downloaded file.
+
+### Building from Source
 ```bash
-npm run dev
+# 1. Clone the repository
+git clone https://github.com/yourusername/copilot-vscode-oss.git
+cd copilot-vscode-oss/copilot-for-vscode-oss
+
+# 2. Install dependencies
+npm install
+cd webview && npm install && cd ..
+
+# 3. Package the extension
+npm run package
+# This generates a .vsix file in the directory
 ```
 
-Press `F5` in VS Code to launch the Extension Development Host.
+## ⚙️ Configuration
 
-### Project Structure
-
-```
-copilot-for-vscode-oss/
-├── .vscode/                    # VS Code configuration
-│   ├── launch.json             # Debug configuration
-│   └── tasks.json              # Build tasks
-├── media/                      # Static assets
-│   └── chat-icon.svg           # Activity bar icon
-├── src/                        # Extension backend (TypeScript)
-│   ├── extension.ts            # Activation entry point
-│   ├── provider.ts             # WebviewViewProvider
-│   ├── services/
-│   │   ├── copilot-service.ts  # Copilot SDK wrapper
-│   │   └── file-service.ts     # File operations
-│   ├── types/
-│   │   └── messages.ts         # Message protocol types
-│   └── utils/
-│       └── nonce.ts            # CSP nonce generator
-├── webview/                    # React frontend
-│   ├── src/
-│   │   ├── App.tsx             # Main app component
-│   │   ├── main.tsx            # Entry point
-│   │   ├── components/         # UI components
-│   │   ├── hooks/              # Custom React hooks
-│   │   ├── styles/             # Global CSS
-│   │   └── types/              # TypeScript types
-│   ├── vite.config.ts          # Vite configuration
-│   └── package.json            # Frontend dependencies
-├── package.json                # Extension manifest
-├── tsconfig.json               # TypeScript config
-└── README.md                   # This file
-```
-
-## Configuration
-
-The extension provides the following settings:
+Customize your experience in VS Code Settings (`Ctrl+,`):
 
 | Setting | Default | Description |
-|---------|---------|-------------|
-| `aiChat.defaultModel` | `gpt-4.1` | Default AI model for new sessions |
-| `aiChat.apiProvider` | `copilot` | AI provider (copilot, openai, etc.) |
+| :--- | :--- | :--- |
+| `aiChat.defaultModel` | `gpt-4.1` | The default model to use for new sessions. |
 
-## Commands
+## 🧭 Roadmap
 
-| Command | Description |
-|---------|-------------|
-| `aiChat.newSession` | Start a new chat session |
-| `aiChat.clearHistory` | Clear chat history |
+- [ ] **Slash commands** (e.g., `/fix`, `/explain`)
+- [ ] **Terminal integration** (run suggested commands directly)
+- [ ] **MCP Server Support** (Model Context Protocol)
 
-## Architecture
+## 🤝 Contributing
 
-The extension follows a multi-process architecture:
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to set up your development environment and submit pull requests.
 
-1. **Extension Host**: Runs TypeScript code, handles API calls
-2. **Webview**: React app for UI rendering
-3. **Communication**: Message-based IPC between processes
+## 📄 License
 
-See the technical specification for detailed architecture documentation.
+This project is licensed under the [AGPL-3.0 License](LICENSE).
 
-## License
+---
 
-MIT
+<div align="center">
+Made with ❤️ for the Open Source Community
+</div>
