@@ -13,11 +13,14 @@ interface ChatPanelProps {
     attachments: FileAttachment[];
     isGenerating: boolean;
     streamingMessageId: string | null;
+    modelsLoading: boolean;
+    modelsError: string | null;
     onSend: (content: string) => void;
     onStop: () => void;
     onAttach: () => void;
     onRemoveAttachment: (path: string) => void;
     onModelChange: (modelId: string) => void;
+    onRequestModels: () => void;
     onNewChat: () => void;
 }
 
@@ -28,11 +31,14 @@ export default function ChatPanel({
     attachments,
     isGenerating,
     streamingMessageId,
+    modelsLoading,
+    modelsError,
     onSend,
     onStop,
     onAttach,
     onRemoveAttachment,
     onModelChange,
+    onRequestModels,
     onNewChat
 }: ChatPanelProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -106,7 +112,10 @@ export default function ChatPanel({
                 <BottomBar
                     models={models}
                     selectedModelId={selectedModelId}
+                    modelsLoading={modelsLoading}
+                    modelsError={modelsError}
                     onModelChange={onModelChange}
+                    onRequestModels={onRequestModels}
                 />
             </div>
         </div>

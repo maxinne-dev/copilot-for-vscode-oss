@@ -5,28 +5,33 @@
     padding: 8px 12px;
 }
 
-.mode-selector {
+.attach-button-container {
     display: flex;
 }
 
-.mode-button {
+.attach-button {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border: 1px solid var(--vscode-button-border, var(--vscode-widget-border));
-    background: var(--vscode-button-secondaryBackground);
-    color: var(--vscode-button-secondaryForeground);
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: var(--vscode-foreground);
     border-radius: 4px;
-    font-size: 12px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background-color 0.1s;
 }
 
-.mode-button:hover {
-    background: var(--vscode-button-secondaryHoverBackground);
+.attach-button:hover {
+    background: var(--vscode-toolbar-hoverBackground);
 }
 
-.mode-button .codicon {
-    font-size: 10px;
+.attach-button:active {
+    background: var(--vscode-toolbar-activeBackground);
+}
+
+.attach-button:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
 }

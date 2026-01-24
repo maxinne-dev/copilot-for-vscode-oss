@@ -8,6 +8,7 @@ export type ClientMessage =
     | { type: 'requestFileAttachment' }
     | { type: 'removeAttachment'; path: string }
     | { type: 'selectModel'; modelId: string }
+    | { type: 'requestModels' }
     | { type: 'newChat' }
     | { type: 'openSettings' };
 
@@ -23,6 +24,8 @@ export type ServerMessage =
     | { type: 'attachmentSelected'; files: FileAttachment[] }
     | { type: 'usageUpdate'; tokens: number; cost?: number }
     | { type: 'modelChanged'; modelId: string }
+    | { type: 'modelsLoaded'; models: ModelOption[] }
+    | { type: 'modelsError'; message: string }
     | { type: 'error'; message: string }
     | { type: 'generationComplete' }
     | { type: 'clearHistory' }

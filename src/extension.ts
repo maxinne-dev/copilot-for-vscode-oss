@@ -27,13 +27,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register commands
     context.subscriptions.push(
-        vscode.commands.registerCommand('aiChat.newSession', () => {
+        vscode.commands.registerCommand('copilot-oss.newSession', () => {
             provider.newSession();
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('aiChat.clearHistory', () => {
+        vscode.commands.registerCommand('copilot-oss.clearHistory', () => {
             provider.clearHistory();
         })
     );

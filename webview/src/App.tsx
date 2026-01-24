@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import ChatPanel from './components/ChatPanel';
 import { useVSCode } from './hooks/useVSCode';
 import { useExtensionMessage } from './hooks/useExtensionMessage';
-import type { ChatMessage, ModelCategory, FileAttachment } from './types';
+import type { ChatMessage, ModelCategory, FileAttachment, ModelOption } from './types';
 
 function App() {
     const vscode = useVSCode();
@@ -14,6 +14,8 @@ function App() {
     const [attachments, setAttachments] = useState<FileAttachment[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+    const [modelsLoading, setModelsLoading] = useState(false);
+    const [modelsError, setModelsError] = useState<string | null>(null);
 
     // Restore state from webview persistence
     useEffect(() => {
@@ -89,6 +91,21 @@ function App() {
                 console.error('Extension error:', message.message);
                 setIsGenerating(false);
                 break;
+
+            case 'modelsLoaded':
+                // Create a single category with all loaded models
+                setModels([{
+                    name: 'Available Models',
+                    models: message.models as ModelOption[]
+                }]);
+                setModelsLoading(false);
+                setModelsError(null);
+                break;
+
+            case 'modelsError':
+                setModelsError(message.message);
+                setModelsLoading(false);
+                break;
         }
     }, []);
 
@@ -124,6 +141,12 @@ function App() {
         vscode.postMessage({ type: 'selectModel', modelId });
     };
 
+    const handleRequestModels = () => {
+        setModelsLoading(true);
+        setModelsError(null);
+        vscode.postMessage({ type: 'requestModels' });
+    };
+
     const handleNewChat = () => {
         vscode.postMessage({ type: 'newChat' });
     };
@@ -136,11 +159,14 @@ function App() {
             attachments={attachments}
             isGenerating={isGenerating}
             streamingMessageId={streamingMessageId}
+            modelsLoading={modelsLoading}
+            modelsError={modelsError}
             onSend={handleSend}
             onStop={handleStop}
             onAttach={handleAttach}
             onRemoveAttachment={handleRemoveAttachment}
             onModelChange={handleModelChange}
+            onRequestModels={handleRequestModels}
             onNewChat={handleNewChat}
         />
     );

@@ -1,45 +1,24 @@
 import * as vscode from 'vscode';
-// Note: @github/copilot-sdk types - these are based on the specification
-// Actual types will be available when the SDK is installed
 
-interface CopilotClientOptions {
-    // Client configuration options
-}
-
-interface SessionOptions {
-    model: string;
-    streaming: boolean;
-}
-
-interface SendOptions {
-    prompt: string;
-    attachments?: Array<{
-        type: 'file';
-        path: string;
-        displayName: string;
-    }>;
-}
-
-interface SessionEvent {
-    type: string;
-    data: {
-        content?: string;
-        deltaContent?: string;
-        toolName?: string;
-        result?: any;
-    };
-}
+// SDK types - loaded dynamically since the SDK is ESM-only
+type CopilotClient = any;
+type CopilotSession = any;
+type SessionEvent = any;
 
 /**
  * Service wrapper for GitHub Copilot SDK integration.
  * Handles session management, streaming, and message routing.
+ * 
+ * Note: The @github/copilot-sdk is an ESM-only module, so we must use
+ * dynamic import() to load it in the CommonJS VS Code extension environment.
  */
 export class CopilotService {
-    private client: any | null = null;
-    private session: any | null = null;
+    private client: CopilotClient | null = null;
+    private session: CopilotSession | null = null;
     private webview: vscode.Webview | null = null;
     private currentMessageId: string | null = null;
     private isInitialized = false;
+    private CopilotClientClass: any = null;
 
     /**
      * Sets the webview instance for sending messages
@@ -49,7 +28,7 @@ export class CopilotService {
     }
 
     /**
-     * Initializes the Copilot client
+     * Initializes the Copilot client and logs connection state
      */
     async initialize(): Promise<void> {
         if (this.isInitialized) {
@@ -57,16 +36,31 @@ export class CopilotService {
         }
 
         try {
-            // Dynamic import of the Copilot SDK
-            // const { CopilotClient } = await import('@github/copilot-sdk');
-            // this.client = new CopilotClient();
-            // await this.client.start();
+            // Dynamic import of the ESM-only SDK
+            // Use Function constructor to prevent TypeScript from compiling import() to require()
+            // This is necessary because @github/copilot-sdk is ESM-only ("type": "module")
+            const importDynamic = new Function('specifier', 'return import(specifier)');
+            const sdk = await importDynamic('@github/copilot-sdk');
+            this.CopilotClientClass = sdk.CopilotClient;
 
-            // Placeholder until SDK is installed
-            console.log('Copilot SDK initialization placeholder');
+            // Create the Copilot client
+            this.client = new this.CopilotClientClass();
+
+            // Log initial connection state
+            const initialState = this.client.getState();
+            console.log('[CopilotService] Initial connection state:', initialState);
+
+            // Start the client (connects to Copilot CLI server)
+            await this.client.start();
+
+            // Log connection state after start
+            const connectedState = this.client.getState();
+            console.log('[CopilotService] Connection state after start:', connectedState);
+
             this.isInitialized = true;
+            console.log('[CopilotService] Copilot SDK initialized successfully');
         } catch (error) {
-            console.error('Failed to initialize Copilot client:', error);
+            console.error('[CopilotService] Failed to initialize Copilot client:', error);
             throw new Error('Failed to initialize Copilot SDK. Ensure Copilot CLI is installed.');
         }
     }
@@ -85,16 +79,17 @@ export class CopilotService {
         }
 
         try {
-            // this.session = await this.client.createSession({
-            //     model,
-            //     streaming: true,
-            // });
-            // this.session.on(this.handleEvent.bind(this));
+            // Create session with the SDK
+            this.session = await this.client!.createSession({
+                model,
+            });
 
-            // Placeholder
-            console.log(`Session created with model: ${model}`);
+            // Subscribe to session events
+            this.session.on(this.handleEvent.bind(this));
+
+            console.log(`[CopilotService] Session created with model: ${model}`);
         } catch (error) {
-            console.error('Failed to create session:', error);
+            console.error('[CopilotService] Failed to create session:', error);
             throw error;
         }
     }
@@ -106,6 +101,9 @@ export class CopilotService {
         if (!this.webview) {
             return;
         }
+
+        // Log all events for debugging
+        console.log('[CopilotService] Session event:', event.type);
 
         switch (event.type) {
             case 'assistant.message_delta':
@@ -126,32 +124,6 @@ export class CopilotService {
                 });
                 break;
 
-            case 'tool.execution_start':
-                // Tool started
-                this.webview.postMessage({
-                    type: 'statusUpdate',
-                    messageId: this.currentMessageId,
-                    step: {
-                        id: `step_${Date.now()}`,
-                        label: event.data.toolName || 'Processing',
-                        status: 'loading'
-                    }
-                });
-                break;
-
-            case 'tool.execution_end':
-                // Tool completed
-                this.webview.postMessage({
-                    type: 'statusUpdate',
-                    messageId: this.currentMessageId,
-                    step: {
-                        id: `step_${Date.now()}`,
-                        label: event.data.toolName || 'Completed',
-                        status: 'success'
-                    }
-                });
-                break;
-
             case 'session.idle':
                 // Generation complete
                 this.webview.postMessage({
@@ -159,6 +131,9 @@ export class CopilotService {
                 });
                 this.currentMessageId = null;
                 break;
+
+            // TODO: Add tool execution event handling when SDK types are confirmed
+            // The SDK may use different event names for tool execution
         }
     }
 

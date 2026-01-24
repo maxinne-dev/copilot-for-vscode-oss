@@ -1,17 +1,21 @@
 import * as vscode from 'vscode';
 import { CopilotService } from './services/copilot-service';
+import { CliService } from './services/cli-service';
 import { getNonce } from './utils/nonce';
-import { ClientMessage, ServerMessage } from './types/messages';
+import { ClientMessage, ServerMessage, ModelOption } from './types/messages';
 
 export class AIChatViewProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'ai-chat.sidebar';
+    public static readonly viewType = 'copilot-oss.sidebar';
 
     private _view?: vscode.WebviewView;
+    private readonly _cliService: CliService;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _copilotService: CopilotService
-    ) { }
+    ) {
+        this._cliService = new CliService();
+    }
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -89,6 +93,10 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
                 await this._copilotService.selectModel(message.modelId);
                 break;
 
+            case 'requestModels':
+                await this._handleRequestModels();
+                break;
+
             case 'newChat':
                 await this.newSession();
                 break;
@@ -96,7 +104,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
             case 'openSettings':
                 await vscode.commands.executeCommand(
                     'workbench.action.openSettings',
-                    'aiChat'
+                    'copilot-oss'
                 );
                 break;
 
@@ -106,8 +114,16 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async _onWebviewReady(): Promise<void> {
+        // Initialize the Copilot service when webview is ready
+        try {
+            await this._copilotService.initialize();
+        } catch (error) {
+            console.warn('[Provider] Copilot service initialization failed:', error);
+            // Continue anyway - the UI can still be shown
+        }
+
         // Send initial data to the webview
-        const config = vscode.workspace.getConfiguration('aiChat');
+        const config = vscode.workspace.getConfiguration('copilot-oss');
         const defaultModel = config.get<string>('defaultModel', 'gpt-4.1');
 
         this._sendMessage({
@@ -170,27 +186,54 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     private _getAvailableModels() {
-        // Models available through GitHub Copilot SDK
+        // Fallback hardcoded models (used for init only)
         return [
             {
-                name: 'Premium Models',
+                name: 'Available Models',
                 models: [
-                    { id: 'gpt-5', name: 'GPT-5', multiplier: '1.0x' },
-                    { id: 'gpt-5.1', name: 'GPT-5.1', multiplier: '1.0x' },
-                    { id: 'claude-sonnet-4.5', name: 'Claude Sonnet 4.5', multiplier: '0.33x' },
-                    { id: 'claude-opus-4.5', name: 'Claude Opus 4.5', multiplier: '3.0x' },
-                    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', multiplier: '1.0x' }
-                ]
-            },
-            {
-                name: 'Standard Models',
-                models: [
-                    { id: 'gpt-4.1', name: 'GPT-4.1', multiplier: 'included', included: true },
-                    { id: 'gpt-4o', name: 'GPT-4o', multiplier: 'included', included: true },
-                    { id: 'gpt-5-mini', name: 'GPT-5 mini', multiplier: 'included', included: true }
+                    { id: 'gpt-4.1', name: 'GPT-4.1', multiplier: '1.0x' }
                 ]
             }
         ];
+    }
+
+    private async _handleRequestModels(): Promise<void> {
+        try {
+            const modelIds = await this._cliService.getAvailableModels();
+            const models: ModelOption[] = modelIds.map(id => ({
+                id,
+                name: id, // Use raw model ID as display name
+                multiplier: '' // Hide multiplier for now
+            }));
+
+            this._sendMessage({
+                type: 'modelsLoaded',
+                models
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to load models';
+            this._sendMessage({
+                type: 'modelsError',
+                message: errorMessage
+            });
+        }
+    }
+
+    /**
+     * Converts a model ID like 'gpt-4.1' or 'claude-sonnet-4.5' to a display name
+     * like 'GPT-4.1' or 'Claude Sonnet 4.5'
+     */
+    private _formatModelName(modelId: string): string {
+        return modelId
+            .split('-')
+            .map(part => {
+                // Handle known prefixes that should be uppercase
+                if (part.toLowerCase() === 'gpt') return 'GPT';
+                if (part.toLowerCase() === 'codex') return 'Codex';
+                // Capitalize first letter of other parts
+                return part.charAt(0).toUpperCase() + part.slice(1);
+            })
+            .join(' ');
     }
 
     private _sendMessage(message: ServerMessage | { type: string;[key: string]: any }): void {
@@ -219,17 +262,11 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'none';
-        font-src ${webview.cspSource};
-        style-src ${webview.cspSource} 'unsafe-inline';
-        script-src 'nonce-${nonce}';
-        img-src ${webview.cspSource} https: data:;
-    ">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https: data:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="${styleUri}" rel="stylesheet">
     <link href="${codiconsUri}" rel="stylesheet">
-    <title>AI Chat</title>
+    <title>Copilot Chat</title>
 </head>
 <body>
     <div id="root"></div>
