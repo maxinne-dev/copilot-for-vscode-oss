@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import ChatPanel from './components/ChatPanel';
 import { useVSCode } from './hooks/useVSCode';
 import { useExtensionMessage } from './hooks/useExtensionMessage';
-import type { ChatMessage, ModelCategory, FileAttachment, ModelOption } from './types';
+import type { ChatMessage, ModelCategory, FileAttachment, ModelOption, SessionMetadata } from './types';
 
 function App() {
     const vscode = useVSCode();
@@ -17,6 +17,12 @@ function App() {
     const [modelsLoading, setModelsLoading] = useState(false);
     const [modelsError, setModelsError] = useState<string | null>(null);
 
+    // Welcome screen state
+    const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
+    const [recentSessions, setRecentSessions] = useState<SessionMetadata[]>([]);
+    const [otherSessions, setOtherSessions] = useState<SessionMetadata[]>([]);
+    const [sessionsLoading, setSessionsLoading] = useState(false);
+
     // Restore state from webview persistence
     useEffect(() => {
         const state = vscode.getState();
@@ -27,6 +33,10 @@ function App() {
 
         // Signal ready to extension
         vscode.postMessage({ type: 'ready' });
+
+        // Request sessions for welcome screen
+        setSessionsLoading(true);
+        vscode.postMessage({ type: 'requestSessions' });
     }, [vscode]);
 
     // Persist state on changes
@@ -106,6 +116,21 @@ function App() {
                 setModelsError(message.message);
                 setModelsLoading(false);
                 break;
+
+            case 'sessionsLoaded':
+                setRecentSessions(message.recentSessions || []);
+                setOtherSessions(message.otherSessions || []);
+                setSessionsLoading(false);
+                break;
+
+            case 'sessionResumed':
+                // Load messages from resumed session
+                if (message.messages && message.messages.length > 0) {
+                    setMessages(message.messages);
+                }
+                // Switch to chat view
+                setShowWelcomeScreen(false);
+                break;
         }
     }, []);
 
@@ -113,12 +138,25 @@ function App() {
 
     // Handlers
     const handleSend = (content: string) => {
-        const attachmentPaths = attachments.map(a => a.path);
+        // Store current attachments for this message
+        const messageAttachments = [...attachments];
+
+        // Add user message locally with attachments
+        const userMessageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        setMessages(prev => [...prev, {
+            id: userMessageId,
+            role: 'user',
+            content,
+            timestamp: Date.now(),
+            attachments: messageAttachments.length > 0 ? messageAttachments : undefined
+        }]);
+
+        // Send to extension with full attachment objects
         vscode.postMessage({
             type: 'sendMessage',
             message: content,
             modelId: selectedModelId,
-            attachments: attachmentPaths
+            attachments: messageAttachments
         });
         setAttachments([]);
     };
@@ -129,6 +167,10 @@ function App() {
 
     const handleAttach = () => {
         vscode.postMessage({ type: 'requestFileAttachment' });
+    };
+
+    const handleAttachFolder = () => {
+        vscode.postMessage({ type: 'requestDirectoryAttachment' });
     };
 
     const handleRemoveAttachment = (path: string) => {
@@ -149,6 +191,19 @@ function App() {
 
     const handleNewChat = () => {
         vscode.postMessage({ type: 'newChat' });
+        setShowWelcomeScreen(false);
+    };
+
+    const handleShowHistory = () => {
+        // Request fresh sessions and show welcome screen
+        setSessionsLoading(true);
+        vscode.postMessage({ type: 'requestSessions' });
+        setShowWelcomeScreen(true);
+    };
+
+    const handleSelectSession = (sessionId: string) => {
+        vscode.postMessage({ type: 'resumeSession', sessionId });
+        // Will switch to chat view when sessionResumed message is received
     };
 
     return (
@@ -161,15 +216,24 @@ function App() {
             streamingMessageId={streamingMessageId}
             modelsLoading={modelsLoading}
             modelsError={modelsError}
+            showSessionList={showWelcomeScreen}
+            recentSessions={recentSessions}
+            otherSessions={otherSessions}
+            sessionsLoading={sessionsLoading}
             onSend={handleSend}
             onStop={handleStop}
             onAttach={handleAttach}
+            onAttachFolder={handleAttachFolder}
             onRemoveAttachment={handleRemoveAttachment}
             onModelChange={handleModelChange}
             onRequestModels={handleRequestModels}
             onNewChat={handleNewChat}
+            onShowHistory={handleShowHistory}
+            onSelectSession={handleSelectSession}
         />
     );
 }
 
 export default App;
+
+

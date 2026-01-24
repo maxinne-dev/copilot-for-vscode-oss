@@ -15,6 +15,7 @@ export interface ChatMessage {
 export interface FileAttachment {
     name: string;
     path: string;
+    type: 'file' | 'directory';
     size?: number;
 }
 
@@ -43,6 +44,17 @@ export interface WebviewState {
 }
 
 /**
+ * Session metadata from Copilot SDK
+ */
+export interface SessionMetadata {
+    sessionId: string;
+    startTime: Date;
+    modifiedTime: Date;
+    summary?: string;
+    isRemote: boolean;
+}
+
+/**
  * VSCode API type
  */
 export interface VSCodeAPI {
@@ -50,3 +62,4 @@ export interface VSCodeAPI {
     getState: () => WebviewState | undefined;
     setState: (state: Partial<WebviewState>) => void;
 }
+

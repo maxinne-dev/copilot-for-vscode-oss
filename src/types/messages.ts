@@ -3,14 +3,17 @@
  */
 export type ClientMessage =
     | { type: 'ready' }
-    | { type: 'sendMessage'; message: string; modelId: string; attachments: string[] }
+    | { type: 'sendMessage'; message: string; modelId: string; attachments: FileAttachment[] }
     | { type: 'stopGeneration' }
     | { type: 'requestFileAttachment' }
     | { type: 'removeAttachment'; path: string }
+    | { type: 'requestDirectoryAttachment' }
     | { type: 'selectModel'; modelId: string }
     | { type: 'requestModels' }
     | { type: 'newChat' }
-    | { type: 'openSettings' };
+    | { type: 'openSettings' }
+    | { type: 'requestSessions' }
+    | { type: 'resumeSession'; sessionId: string };
 
 /**
  * Message types sent from Extension Host to Webview
@@ -29,7 +32,20 @@ export type ServerMessage =
     | { type: 'error'; message: string }
     | { type: 'generationComplete' }
     | { type: 'clearHistory' }
-    | { type: 'viewVisible' };
+    | { type: 'viewVisible' }
+    | { type: 'sessionsLoaded'; recentSessions: SessionMetadata[]; otherSessions: SessionMetadata[] }
+    | { type: 'sessionResumed'; sessionId: string; messages: ChatMessage[] };
+
+/**
+ * Session metadata from Copilot SDK
+ */
+export interface SessionMetadata {
+    sessionId: string;
+    startTime: Date;
+    modifiedTime: Date;
+    summary?: string;
+    isRemote: boolean;
+}
 
 /**
  * Chat message structure
@@ -49,6 +65,7 @@ export interface ChatMessage {
 export interface FileAttachment {
     name: string;
     path: string;
+    type: 'file' | 'directory';
     size?: number;
 }
 

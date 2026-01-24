@@ -40,7 +40,19 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
             )}
             <div className="message-content">
                 {isUser ? (
-                    <div className="user-text">{message.content}</div>
+                    <>
+                        <div className="user-text">{message.content}</div>
+                        {message.attachments && message.attachments.length > 0 && (
+                            <div className="message-attachments">
+                                {message.attachments.map((att) => (
+                                    <div key={att.path} className="message-attachment-chip">
+                                        <i className={`codicon ${att.type === 'directory' ? 'codicon-folder' : 'codicon-file'}`}></i>
+                                        <span className="attachment-name">{att.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <>
                         <ReactMarkdown

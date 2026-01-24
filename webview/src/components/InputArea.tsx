@@ -9,6 +9,7 @@ interface InputAreaProps {
     onSend: (content: string) => void;
     onStop: () => void;
     onAttach: () => void;
+    onAttachFolder: () => void;
     onRemoveAttachment: (path: string) => void;
 }
 
@@ -18,6 +19,7 @@ export default function InputArea({
     onSend,
     onStop,
     onAttach,
+    onAttachFolder,
     onRemoveAttachment
 }: InputAreaProps) {
     const [input, setInput] = useState('');
@@ -51,7 +53,7 @@ export default function InputArea({
                 <div className="attachments-bar">
                     {attachments.map((file) => (
                         <div key={file.path} className="attachment-chip">
-                            <i className="codicon codicon-file"></i>
+                            <i className={`codicon ${file.type === 'directory' ? 'codicon-folder' : 'codicon-file'}`}></i>
                             <span className="attachment-name">{file.name}</span>
                             <button
                                 className="remove-attachment"
@@ -79,6 +81,15 @@ export default function InputArea({
                 />
 
                 <div className="input-actions">
+                    <button
+                        className="attach-button"
+                        onClick={onAttachFolder}
+                        title="Attach folder"
+                        disabled={isGenerating}
+                    >
+                        <i className="codicon codicon-folder"></i>
+                    </button>
+
                     <button
                         className="attach-button"
                         onClick={onAttach}

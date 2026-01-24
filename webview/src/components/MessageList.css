@@ -139,3 +139,34 @@
     background: var(--vscode-toolbar-hoverBackground);
     color: var(--vscode-foreground);
 }
+
+/* Message attachments in chat history */
+.message-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.message-attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.message-attachment-chip .codicon {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.message-attachment-chip .attachment-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

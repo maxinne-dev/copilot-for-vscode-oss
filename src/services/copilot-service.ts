@@ -5,6 +5,9 @@ type CopilotClient = any;
 type CopilotSession = any;
 type SessionEvent = any;
 
+// Import FileAttachment type
+import type { FileAttachment } from '../types/messages';
+
 /**
  * Service wrapper for GitHub Copilot SDK integration.
  * Handles session management, streaming, and message routing.
@@ -82,6 +85,7 @@ export class CopilotService {
             // Create session with the SDK
             this.session = await this.client!.createSession({
                 model,
+                streaming: true,
             });
 
             // Subscribe to session events
@@ -132,15 +136,36 @@ export class CopilotService {
                 this.currentMessageId = null;
                 break;
 
-            // TODO: Add tool execution event handling when SDK types are confirmed
-            // The SDK may use different event names for tool execution
+            case 'tool.execution_start':
+                this.webview.postMessage({
+                    type: 'statusUpdate',
+                    messageId: this.currentMessageId,
+                    step: {
+                        id: event.data.toolCallId || `tool_${Date.now()}`,
+                        label: event.data.toolName,
+                        status: 'loading'
+                    }
+                });
+                break;
+
+            case 'tool.execution_end':
+                this.webview.postMessage({
+                    type: 'statusUpdate',
+                    messageId: this.currentMessageId,
+                    step: {
+                        id: event.data.toolCallId || `tool_${Date.now()}`,
+                        label: event.data.toolName,
+                        status: event.data.error ? 'error' : 'success'
+                    }
+                });
+                break;
         }
     }
 
     /**
      * Sends a message to the AI
      */
-    async sendMessage(prompt: string, modelId: string, attachmentPaths: string[]): Promise<void> {
+    async sendMessage(prompt: string, modelId: string, attachments: FileAttachment[]): Promise<void> {
         // Ensure session exists with correct model
         if (!this.session) {
             await this.createSession(modelId);
@@ -158,21 +183,18 @@ export class CopilotService {
         });
 
         try {
-            // Prepare attachments
-            const attachments = attachmentPaths.map(path => ({
-                type: 'file' as const,
-                path,
-                displayName: path.split(/[\\/]/).pop() || path
+            // Prepare attachments for SDK format
+            const sdkAttachments = attachments.map(att => ({
+                type: att.type,
+                path: att.path,
+                displayName: att.name
             }));
 
             // Send to session
-            // await this.session.send({
-            //     prompt,
-            //     attachments: attachments.length > 0 ? attachments : undefined
-            // });
-
-            // Placeholder: simulate response
-            this.simulateResponse(prompt);
+            await this.session.send({
+                prompt,
+                attachments: sdkAttachments.length > 0 ? sdkAttachments : undefined
+            });
         } catch (error) {
             console.error('Failed to send message:', error);
             this.webview?.postMessage({
@@ -182,52 +204,19 @@ export class CopilotService {
         }
     }
 
-    /**
-     * Simulates a response for development/testing
-     * Remove this when SDK is integrated
-     */
-    private simulateResponse(prompt: string): void {
-        const response = `This is a simulated response to: "${prompt}"\n\nThe GitHub Copilot SDK integration is not yet complete. Once the SDK is properly installed and configured, this will show actual AI responses.\n\n**Features to expect:**\n- Streaming responses\n- Tool execution tracking\n- Multi-model support`;
-
-        // Simulate streaming
-        let index = 0;
-        const chunkSize = 10;
-
-        const interval = setInterval(() => {
-            if (index >= response.length) {
-                clearInterval(interval);
-                this.webview?.postMessage({
-                    type: 'streamEnd',
-                    messageId: this.currentMessageId
-                });
-                this.webview?.postMessage({
-                    type: 'generationComplete'
-                });
-                return;
-            }
-
-            const chunk = response.slice(index, index + chunkSize);
-            this.webview?.postMessage({
-                type: 'streamChunk',
-                messageId: this.currentMessageId,
-                content: chunk
-            });
-            index += chunkSize;
-        }, 50);
-    }
 
     /**
      * Stops the current generation
      */
     async stopGeneration(): Promise<void> {
         try {
-            // await this.session?.abort();
-            console.log('Generation stopped');
+            await this.session?.abort();
+            console.log('[CopilotService] Generation stopped');
             this.webview?.postMessage({
                 type: 'generationComplete'
             });
         } catch (error) {
-            console.error('Failed to stop generation:', error);
+            console.error('[CopilotService] Failed to stop generation:', error);
         }
     }
 
@@ -248,6 +237,75 @@ export class CopilotService {
     newSession(): void {
         this.session = null;
         this.currentMessageId = null;
+    }
+
+    /**
+     * Lists all available sessions from the Copilot SDK
+     */
+    async listSessions(): Promise<any[]> {
+        if (!this.client) {
+            await this.initialize();
+        }
+
+        try {
+            const sessions = await this.client!.listSessions();
+            console.log('[CopilotService] Listed sessions:', sessions.length);
+            return sessions;
+        } catch (error) {
+            console.error('[CopilotService] Failed to list sessions:', error);
+            // Return empty array if SDK is not available or fails
+            return [];
+        }
+    }
+
+    /**
+     * Resumes an existing session by ID and returns its messages
+     */
+    async resumeSession(sessionId: string): Promise<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: number }[]> {
+        if (!this.client) {
+            await this.initialize();
+        }
+
+        // Close existing session if any
+        if (this.session) {
+            await this.session.destroy();
+        }
+
+        try {
+            this.session = await this.client!.resumeSession(sessionId, {
+                streaming: true,
+            });
+            this.session.on(this.handleEvent.bind(this));
+            console.log(`[CopilotService] Resumed session: ${sessionId}`);
+
+            // Load messages from the session
+            const events = await this.session.getMessages();
+            const messages: { id: string; role: 'user' | 'assistant'; content: string; timestamp: number }[] = [];
+
+            for (const event of events) {
+                if (event.type === 'user.message') {
+                    messages.push({
+                        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        role: 'user',
+                        content: event.data.content || '',
+                        timestamp: Date.now()
+                    });
+                } else if (event.type === 'assistant.message') {
+                    messages.push({
+                        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        role: 'assistant',
+                        content: event.data.content || '',
+                        timestamp: Date.now()
+                    });
+                }
+            }
+
+            console.log(`[CopilotService] Loaded ${messages.length} messages from session`);
+            return messages;
+        } catch (error) {
+            console.error('[CopilotService] Failed to resume session:', error);
+            throw error;
+        }
     }
 
     /**

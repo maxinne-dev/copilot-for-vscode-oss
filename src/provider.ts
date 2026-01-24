@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { CopilotService } from './services/copilot-service';
 import { CliService } from './services/cli-service';
 import { getNonce } from './utils/nonce';
-import { ClientMessage, ServerMessage, ModelOption } from './types/messages';
+import { ClientMessage, ServerMessage, ModelOption, SessionMetadata, FileAttachment } from './types/messages';
 
 export class AIChatViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'copilot-oss.sidebar';
@@ -89,6 +89,10 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
                 console.log('Attachment removed:', message.path);
                 break;
 
+            case 'requestDirectoryAttachment':
+                await this._handleDirectoryAttachmentRequest();
+                break;
+
             case 'selectModel':
                 await this._copilotService.selectModel(message.modelId);
                 break;
@@ -106,6 +110,14 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
                     'workbench.action.openSettings',
                     'copilot-oss'
                 );
+                break;
+
+            case 'requestSessions':
+                await this._handleRequestSessions();
+                break;
+
+            case 'resumeSession':
+                await this._handleResumeSession(message.sessionId);
                 break;
 
             default:
@@ -137,7 +149,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
     private async _handleUserMessage(
         content: string,
         modelId: string,
-        attachmentPaths: string[]
+        attachments: FileAttachment[]
     ): Promise<void> {
         try {
             // Add user message to chat
@@ -150,7 +162,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
             });
 
             // Send to Copilot service
-            await this._copilotService.sendMessage(content, modelId, attachmentPaths);
+            await this._copilotService.sendMessage(content, modelId, attachments);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             this._sendMessage({
@@ -172,15 +184,39 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         });
 
         if (uris && uris.length > 0) {
-            const files = uris.map(uri => ({
+            const files: FileAttachment[] = uris.map(uri => ({
                 name: uri.path.split('/').pop() || uri.fsPath,
                 path: uri.fsPath,
+                type: 'file' as const,
                 size: undefined // Will be determined when reading
             }));
 
             this._sendMessage({
                 type: 'attachmentSelected',
                 files
+            });
+        }
+    }
+
+    private async _handleDirectoryAttachmentRequest(): Promise<void> {
+        const uris = await vscode.window.showOpenDialog({
+            canSelectMany: true,
+            canSelectFolders: true,
+            canSelectFiles: false,
+            openLabel: 'Attach Folder'
+        });
+
+        if (uris && uris.length > 0) {
+            const folders: FileAttachment[] = uris.map(uri => ({
+                name: uri.path.split('/').pop() || uri.fsPath,
+                path: uri.fsPath,
+                type: 'directory' as const,
+                size: undefined
+            }));
+
+            this._sendMessage({
+                type: 'attachmentSelected',
+                files: folders
             });
         }
     }
@@ -214,6 +250,68 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
             const errorMessage = error instanceof Error ? error.message : 'Failed to load models';
             this._sendMessage({
                 type: 'modelsError',
+                message: errorMessage
+            });
+        }
+    }
+
+    private async _handleRequestSessions(): Promise<void> {
+        try {
+            const sessions = await this._copilotService.listSessions();
+
+            // Group sessions: Recent (last 24h, max 7) and Other Conversations
+            const now = Date.now();
+            const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
+
+            // Sort by modifiedTime descending (most recent first)
+            const sortedSessions = sessions.sort((a: SessionMetadata, b: SessionMetadata) => {
+                const aTime = new Date(a.modifiedTime).getTime();
+                const bTime = new Date(b.modifiedTime).getTime();
+                return bTime - aTime;
+            });
+
+            const recentSessions: SessionMetadata[] = [];
+            const otherSessions: SessionMetadata[] = [];
+
+            for (const session of sortedSessions) {
+                const modifiedTime = new Date(session.modifiedTime).getTime();
+                const isWithin24Hours = modifiedTime >= twentyFourHoursAgo;
+
+                if (isWithin24Hours && recentSessions.length < 7) {
+                    recentSessions.push(session);
+                } else {
+                    otherSessions.push(session);
+                }
+            }
+
+            this._sendMessage({
+                type: 'sessionsLoaded',
+                recentSessions,
+                otherSessions
+            });
+        } catch (error) {
+            console.error('[Provider] Failed to load sessions:', error);
+            // Send empty lists on error
+            this._sendMessage({
+                type: 'sessionsLoaded',
+                recentSessions: [],
+                otherSessions: []
+            });
+        }
+    }
+
+    private async _handleResumeSession(sessionId: string): Promise<void> {
+        try {
+            const messages = await this._copilotService.resumeSession(sessionId);
+            this._sendMessage({
+                type: 'sessionResumed',
+                sessionId,
+                messages
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to resume session';
+            this._sendMessage({
+                type: 'error',
                 message: errorMessage
             });
         }
