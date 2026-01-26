@@ -300,8 +300,11 @@ export class CopilotService {
                 }
             }
 
-            console.log(`[CopilotService] Loaded ${messages.length} messages from session`);
-            return messages;
+            // Filter out messages with empty content
+            const validMessages = messages.filter(msg => msg.content.trim() !== '');
+
+            console.log(`[CopilotService] Loaded ${validMessages.length} messages from session (filtered from ${messages.length} total)`);
+            return validMessages;
         } catch (error) {
             console.error('[CopilotService] Failed to resume session:', error);
             throw error;

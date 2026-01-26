@@ -35,12 +35,14 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
         <div className={`message ${isUser ? 'user-message' : 'assistant-message'}`}>
             {!isUser && (
                 <div className="message-avatar">
-                    <i className="codicon codicon-sparkle"></i>
+                    <i className="codicon codicon-copilot"></i>
+                    {/*  TODO: Add model's name, like "gpt-4.1", so the user can now the model responsible for the response  */}
                 </div>
             )}
             <div className="message-content">
                 {isUser ? (
                     <>
+                        {/* TODO: Add the icon "codicon-comment-discussion-quote" to the top right to represent the user's message */}
                         <div className="user-text">{message.content}</div>
                         {message.attachments && message.attachments.length > 0 && (
                             <div className="message-attachments">
@@ -106,17 +108,17 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
                     </>
                 )}
             </div>
-            {!isUser && !isStreaming && (
+            {!isStreaming && (
                 <div className="message-actions">
                     <button className="action-button" title="Copy">
                         <i className="codicon codicon-copy"></i>
                     </button>
-                    <button className="action-button" title="Good response">
-                        <i className="codicon codicon-thumbsup"></i>
-                    </button>
-                    <button className="action-button" title="Bad response">
-                        <i className="codicon codicon-thumbsdown"></i>
-                    </button>
+                    {/*<button className="action-button" title="Good response">*/}
+                    {/*    <i className="codicon codicon-thumbsup"></i>*/}
+                    {/*</button>*/}
+                    {/*<button className="action-button" title="Bad response">*/}
+                    {/*    <i className="codicon codicon-thumbsdown"></i>*/}
+                    {/*</button>*/}
                 </div>
             )}
         </div>

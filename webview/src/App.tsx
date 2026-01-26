@@ -22,6 +22,7 @@ function App() {
     const [recentSessions, setRecentSessions] = useState<SessionMetadata[]>([]);
     const [otherSessions, setOtherSessions] = useState<SessionMetadata[]>([]);
     const [sessionsLoading, setSessionsLoading] = useState(false);
+    const [shouldHonorClearHistory, setShouldHonorClearHistory] = useState(true);
 
     // Restore state from webview persistence
     useEffect(() => {
@@ -93,8 +94,13 @@ function App() {
                 break;
 
             case 'clearHistory':
-                setMessages([]);
-                setAttachments([]);
+                // Only clear if we should honor this response
+                if (shouldHonorClearHistory) {
+                    setMessages([]);
+                    setAttachments([]);
+                }
+                // Reset the flag
+                setShouldHonorClearHistory(true);
                 break;
 
             case 'error':
@@ -138,6 +144,14 @@ function App() {
 
     // Handlers
     const handleSend = (content: string) => {
+        // If sending from welcome screen, start a new session
+        if (showWelcomeScreen) {
+            setMessages([]); // Clear messages locally first
+            setShouldHonorClearHistory(false); // Ignore the clearHistory response
+            vscode.postMessage({ type: 'newChat' });
+            setShowWelcomeScreen(false);
+        }
+
         // Store current attachments for this message
         const messageAttachments = [...attachments];
 
