@@ -36,13 +36,12 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
             {!isUser && (
                 <div className="message-avatar">
                     <i className="codicon codicon-copilot"></i>
-                    {/*  TODO: Add model's name, like "gpt-4.1", so the user can now the model responsible for the response  */}
+                    {message.model && <span className="model-name">{message.model}</span>}
                 </div>
             )}
             <div className="message-content">
                 {isUser ? (
                     <>
-                        {/* TODO: Add the icon "codicon-comment-discussion-quote" to the top right to represent the user's message */}
                         <div className="user-text">{message.content}</div>
                         {message.attachments && message.attachments.length > 0 && (
                             <div className="message-attachments">
@@ -108,7 +107,12 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
                     </>
                 )}
             </div>
-            {!isStreaming && (
+            {isUser && (
+                <div className="message-avatar user-avatar">
+                    <i className="codicon codicon-comment-discussion"></i>
+                </div>
+            )}
+            {!isStreaming && !isUser && (
                 <div className="message-actions">
                     <button className="action-button" title="Copy">
                         <i className="codicon codicon-copy"></i>

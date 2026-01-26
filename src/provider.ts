@@ -119,7 +119,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
                 break;
 
             case 'resumeSession':
-                await this._handleResumeSession(message.sessionId);
+                await this._handleResumeSession(message.sessionId, message.modelId);
                 break;
 
             default:
@@ -490,9 +490,9 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    private async _handleResumeSession(sessionId: string): Promise<void> {
+    private async _handleResumeSession(sessionId: string, modelId: string): Promise<void> {
         try {
-            const messages = await this._copilotService.resumeSession(sessionId);
+            const messages = await this._copilotService.resumeSession(sessionId, modelId);
             this._sendMessage({
                 type: 'sessionResumed',
                 sessionId,

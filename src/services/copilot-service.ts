@@ -20,6 +20,7 @@ export class CopilotService {
     private session: CopilotSession | null = null;
     private webview: vscode.Webview | null = null;
     private currentMessageId: string | null = null;
+    private currentModel: string | null = null;
     private isInitialized = false;
     private CopilotClientClass: any = null;
 
@@ -90,6 +91,9 @@ export class CopilotService {
 
             // Subscribe to session events
             this.session.on(this.handleEvent.bind(this));
+
+            // Store current model
+            this.currentModel = model;
 
             console.log(`[CopilotService] Session created with model: ${model}`);
         } catch (error) {
@@ -179,7 +183,8 @@ export class CopilotService {
             type: 'addMessage',
             id: this.currentMessageId,
             role: 'assistant',
-            content: ''
+            content: '',
+            model: modelId
         });
 
         try {
@@ -261,7 +266,7 @@ export class CopilotService {
     /**
      * Resumes an existing session by ID and returns its messages
      */
-    async resumeSession(sessionId: string): Promise<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: number }[]> {
+    async resumeSession(sessionId: string, modelId?: string): Promise<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: number; model?: string }[]> {
         if (!this.client) {
             await this.initialize();
         }
@@ -269,6 +274,11 @@ export class CopilotService {
         // Close existing session if any
         if (this.session) {
             await this.session.destroy();
+        }
+
+        // Store the model ID for resumed session messages
+        if (modelId) {
+            this.currentModel = modelId;
         }
 
         try {
@@ -280,7 +290,7 @@ export class CopilotService {
 
             // Load messages from the session
             const events = await this.session.getMessages();
-            const messages: { id: string; role: 'user' | 'assistant'; content: string; timestamp: number }[] = [];
+            const messages: { id: string; role: 'user' | 'assistant'; content: string; timestamp: number; model?: string }[] = [];
 
             for (const event of events) {
                 if (event.type === 'user.message') {
@@ -295,7 +305,8 @@ export class CopilotService {
                         id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                         role: 'assistant',
                         content: event.data.content || '',
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
+                        model: this.currentModel || undefined
                     });
                 }
             }

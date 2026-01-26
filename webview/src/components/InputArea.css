@@ -74,6 +74,7 @@
     line-height: 1.5;
     resize: none;
     outline: none;
+    outline-color: transparent !important;
 }
 
 .message-input::placeholder {

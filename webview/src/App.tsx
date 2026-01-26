@@ -60,7 +60,8 @@ function App() {
                     id: message.id,
                     role: message.role,
                     content: message.content,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    model: message.model
                 }]);
                 if (message.role === 'assistant') {
                     setIsGenerating(true);
@@ -216,7 +217,7 @@ function App() {
     };
 
     const handleSelectSession = (sessionId: string) => {
-        vscode.postMessage({ type: 'resumeSession', sessionId });
+        vscode.postMessage({ type: 'resumeSession', sessionId, modelId: selectedModelId });
         // Will switch to chat view when sessionResumed message is received
     };
 

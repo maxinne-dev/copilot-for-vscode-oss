@@ -13,14 +13,14 @@ export type ClientMessage =
     | { type: 'newChat' }
     | { type: 'openSettings' }
     | { type: 'requestSessions' }
-    | { type: 'resumeSession'; sessionId: string };
+    | { type: 'resumeSession'; sessionId: string; modelId: string };
 
 /**
  * Message types sent from Extension Host to Webview
  */
 export type ServerMessage =
     | { type: 'init'; models: ModelCategory[]; history: ChatMessage[]; defaultModel?: string }
-    | { type: 'addMessage'; id: string; role: 'user' | 'assistant'; content: string }
+    | { type: 'addMessage'; id: string; role: 'user' | 'assistant'; content: string; model?: string }
     | { type: 'streamChunk'; messageId: string; content: string }
     | { type: 'streamEnd'; messageId: string }
     | { type: 'statusUpdate'; messageId: string; step: ProgressStep }
@@ -55,6 +55,7 @@ export interface ChatMessage {
     role: 'user' | 'assistant';
     content: string;
     timestamp: number;
+    model?: string;
     attachments?: FileAttachment[];
     steps?: ProgressStep[];
 }

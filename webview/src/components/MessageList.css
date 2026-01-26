@@ -10,6 +10,7 @@
 }
 
 .user-message {
+    flex-direction: row;
     justify-content: flex-end;
 }
 
@@ -18,6 +19,12 @@
     border-radius: 12px;
     padding: 10px 14px;
     max-width: 85%;
+    order: 1;
+}
+
+.user-message .user-avatar {
+    order: 2;
+    margin-left: 8px;
 }
 
 .user-text {
@@ -30,15 +37,33 @@
 }
 
 .message-avatar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--vscode-button-background);
+    font-size: 16px;
+}
+
+.message-avatar .codicon {
     width: 24px;
     height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--vscode-button-background);
-    font-size: 16px;
 }
 
+.model-name {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    font-weight: normal;
+    line-height: 1;
+    position: relative;
+    top: -1px;
+}
+
+.assistant-message .model-name {
+    margin-bottom: 8px;
+}
 .assistant-message .message-content {
     padding-left: 32px;
     line-height: 1.5;
