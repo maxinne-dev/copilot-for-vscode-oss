@@ -13,7 +13,7 @@ export type ClientMessage =
     | { type: 'newChat' }
     | { type: 'openSettings' }
     | { type: 'requestSessions' }
-    | { type: 'resumeSession'; sessionId: string; modelId: string };
+    | { type: 'resumeSession'; sessionId: string; modelId?: string };
 
 /**
  * Message types sent from Extension Host to Webview
@@ -24,6 +24,7 @@ export type ServerMessage =
     | { type: 'streamChunk'; messageId: string; content: string }
     | { type: 'streamEnd'; messageId: string }
     | { type: 'statusUpdate'; messageId: string; step: ProgressStep }
+    | { type: 'toolEvent'; messageId: string; event: ToolEvent }
     | { type: 'attachmentSelected'; files: FileAttachment[] }
     | { type: 'usageUpdate'; tokens: number; cost?: number }
     | { type: 'modelChanged'; modelId: string }
@@ -58,6 +59,7 @@ export interface ChatMessage {
     model?: string;
     attachments?: FileAttachment[];
     steps?: ProgressStep[];
+    toolEvents?: ToolEvent[];
 }
 
 /**
@@ -77,6 +79,19 @@ export interface ProgressStep {
     id: string;
     label: string;
     status: 'pending' | 'loading' | 'success' | 'error';
+}
+
+/**
+ * Tool execution event for inline display
+ */
+export interface ToolEvent {
+    id: string;
+    toolCallId: string;
+    toolName: string;
+    status: 'loading' | 'success' | 'error';
+    label: string;           // Human-readable description (e.g., "Read utils.ts")
+    details?: string;        // Additional info (e.g., "45 lines read")
+    timestamp: number;
 }
 
 /**

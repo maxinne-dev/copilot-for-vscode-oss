@@ -119,7 +119,8 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
                 break;
 
             case 'resumeSession':
-                await this._handleResumeSession(message.sessionId, message.modelId);
+                await this._handleResumeSession(message.sessionId, message.modelId ?? '');
+                console.log('Session resumed:', message);
                 break;
 
             default:

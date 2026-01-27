@@ -3,16 +3,6 @@
  * These mirror the extension types for consistency
  */
 
-export interface ChatMessage {
-    id: string;
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp: number;
-    model?: string;
-    attachments?: FileAttachment[];
-    steps?: ProgressStep[];
-}
-
 export interface FileAttachment {
     name: string;
     path: string;
@@ -24,6 +14,27 @@ export interface ProgressStep {
     id: string;
     label: string;
     status: 'pending' | 'loading' | 'success' | 'error';
+}
+
+export interface ToolEvent {
+    id: string;
+    toolCallId: string;
+    toolName: string;
+    status: 'loading' | 'success' | 'error';
+    label: string;           // Human-readable description
+    details?: string;        // Additional info (line count, etc.)
+    timestamp: number;
+}
+
+export interface ChatMessage {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: number;
+    model?: string;
+    attachments?: FileAttachment[];
+    steps?: ProgressStep[];
+    toolEvents?: ToolEvent[];
 }
 
 export interface ModelCategory {
@@ -63,4 +74,3 @@ export interface VSCodeAPI {
     getState: () => WebviewState | undefined;
     setState: (state: Partial<WebviewState>) => void;
 }
-

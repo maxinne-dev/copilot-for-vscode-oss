@@ -134,9 +134,41 @@ function App() {
                 // Load messages from resumed session
                 if (message.messages && message.messages.length > 0) {
                     setMessages(message.messages);
+
+                    // Extract and apply the model from the last assistant message
+                    // This ensures we show the correct model immediately, without waiting for modelChanged
+                    for (let i = message.messages.length - 1; i >= 0; i--) {
+                        const msg = message.messages[i];
+                        if (msg.role === 'assistant' && msg.model) {
+                            setSelectedModelId(msg.model);
+                            console.log('[App] Restored session with model:', msg.model);
+                            break;
+                        }
+                    }
                 }
                 // Switch to chat view
                 setShowWelcomeScreen(false);
+                break;
+
+            case 'toolEvent':
+                // Add or update tool event in the current message
+                setMessages(prev => prev.map(msg => {
+                    if (msg.id === message.messageId) {
+                        const existingEvents = msg.toolEvents || [];
+                        const eventIndex = existingEvents.findIndex(e => e.toolCallId === message.event.toolCallId);
+
+                        if (eventIndex >= 0) {
+                            // Update existing event (loading -> success/error)
+                            const updatedEvents = [...existingEvents];
+                            updatedEvents[eventIndex] = message.event;
+                            return { ...msg, toolEvents: updatedEvents };
+                        } else {
+                            // Add new event
+                            return { ...msg, toolEvents: [...existingEvents, message.event] };
+                        }
+                    }
+                    return msg;
+                }));
                 break;
         }
     }, []);
@@ -217,8 +249,9 @@ function App() {
     };
 
     const handleSelectSession = (sessionId: string) => {
-        vscode.postMessage({ type: 'resumeSession', sessionId, modelId: selectedModelId });
-        // Will switch to chat view when sessionResumed message is received
+        // Don't send modelId - let the extension detect it from the session
+        vscode.postMessage({ type: 'resumeSession', sessionId });
+        // Will switch to chat view and model will be updated when sessionResumed message is received
     };
 
     return (
