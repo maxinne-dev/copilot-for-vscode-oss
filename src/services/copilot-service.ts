@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as os from 'os';
 
 // SDK types - loaded dynamically since the SDK is ESM-only
 type CopilotClient = any;
@@ -59,8 +60,15 @@ export class CopilotService {
             const sdk = await importDynamic('@github/copilot-sdk');
             this.CopilotClientClass = sdk.CopilotClient;
 
-            // Create the Copilot client
-            this.client = new this.CopilotClientClass();
+            // Determine working directory: first workspace folder or user home
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            const cwd = workspaceFolders && workspaceFolders.length > 0
+                ? workspaceFolders[0].uri.fsPath
+                : os.homedir();
+            console.log('[CopilotService] Using working directory:', cwd);
+
+            // Create the Copilot client with the working directory
+            this.client = new this.CopilotClientClass({ cwd });
 
             // Log initial connection state
             const initialState = this.client.getState();
@@ -224,9 +232,9 @@ export class CopilotService {
         const result = data.result || {};
 
         // Log for debugging file path extraction
-        if (toolName.includes('edit') || toolName.includes('write') || toolName.includes('view')) {
-            console.log(`[CopilotService] Tool: ${toolName}, Args:`, JSON.stringify(args, null, 2));
-        }
+        // if (toolName.includes('edit') || toolName.includes('write') || toolName.includes('view')) {
+        //     console.log(`[CopilotService] Tool: ${toolName}, Args:`, JSON.stringify(args, null, 2));
+        // }
 
         // Extract human-readable label and details based on tool type
         let label = toolName;
