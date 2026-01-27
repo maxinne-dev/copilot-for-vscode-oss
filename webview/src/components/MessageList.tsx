@@ -2,6 +2,7 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ToolEventIndicator from './ToolEventIndicator';
+import ReasoningBlock from './ReasoningBlock';
 import type { ChatMessage } from '../types';
 import './MessageList.css';
 
@@ -57,6 +58,10 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
                     </>
                 ) : (
                     <>
+                        {/* Reasoning block displayed before tool events */}
+                        {message.reasoning && (
+                            <ReasoningBlock reasoning={message.reasoning} />
+                        )}
                         {/* Tool events displayed inline before content */}
                         {message.toolEvents && message.toolEvents.length > 0 && (
                             <div className="tool-events-container">

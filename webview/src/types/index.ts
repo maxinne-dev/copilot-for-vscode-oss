@@ -33,6 +33,12 @@ export interface ToolEvent {
     timestamp: number;
 }
 
+export interface ReasoningBlock {
+    reasoningId: string;
+    content: string;           // Full/accumulated reasoning text
+    isComplete: boolean;       // True when reasoning is finished
+}
+
 export interface ChatMessage {
     id: string;
     role: 'user' | 'assistant';
@@ -42,6 +48,7 @@ export interface ChatMessage {
     attachments?: FileAttachment[];
     steps?: ProgressStep[];
     toolEvents?: ToolEvent[];
+    reasoning?: ReasoningBlock;
 }
 
 export interface ModelCategory {

@@ -26,6 +26,15 @@ export interface ContextUsageInfo {
 }
 
 /**
+ * Reasoning block for AI thinking/reasoning display
+ */
+export interface ReasoningBlock {
+    reasoningId: string;
+    content: string;           // Full/accumulated reasoning text
+    isComplete: boolean;       // True when reasoning is finished
+}
+
+/**
  * Message types sent from Extension Host to Webview
  */
 export type ServerMessage =
@@ -33,6 +42,8 @@ export type ServerMessage =
     | { type: 'addMessage'; id: string; role: 'user' | 'assistant'; content: string; model?: string }
     | { type: 'streamChunk'; messageId: string; content: string }
     | { type: 'streamEnd'; messageId: string }
+    | { type: 'reasoningDelta'; messageId: string; reasoningId: string; deltaContent: string }
+    | { type: 'reasoningComplete'; messageId: string; reasoningId: string; content: string }
     | { type: 'statusUpdate'; messageId: string; step: ProgressStep }
     | { type: 'toolEvent'; messageId: string; event: ToolEvent }
     | { type: 'attachmentSelected'; files: FileAttachment[] }
@@ -72,6 +83,7 @@ export interface ChatMessage {
     attachments?: FileAttachment[];
     steps?: ProgressStep[];
     toolEvents?: ToolEvent[];
+    reasoning?: ReasoningBlock;
 }
 
 /**

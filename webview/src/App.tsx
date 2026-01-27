@@ -184,6 +184,53 @@ function App() {
                 }));
                 break;
 
+            case 'reasoningDelta':
+                // Append delta content to message's reasoning block
+                setMessages(prev => prev.map(msg => {
+                    if (msg.id === message.messageId) {
+                        const existingReasoning = msg.reasoning;
+                        if (existingReasoning && existingReasoning.reasoningId === message.reasoningId) {
+                            // Append to existing reasoning
+                            return {
+                                ...msg,
+                                reasoning: {
+                                    ...existingReasoning,
+                                    content: existingReasoning.content + message.deltaContent
+                                }
+                            };
+                        } else {
+                            // Create new reasoning block
+                            return {
+                                ...msg,
+                                reasoning: {
+                                    reasoningId: message.reasoningId,
+                                    content: message.deltaContent,
+                                    isComplete: false
+                                }
+                            };
+                        }
+                    }
+                    return msg;
+                }));
+                break;
+
+            case 'reasoningComplete':
+                // Mark reasoning as complete with full content
+                setMessages(prev => prev.map(msg => {
+                    if (msg.id === message.messageId) {
+                        return {
+                            ...msg,
+                            reasoning: {
+                                reasoningId: message.reasoningId,
+                                content: msg.reasoning?.content || message.content,
+                                isComplete: true
+                            }
+                        };
+                    }
+                    return msg;
+                }));
+                break;
+
             case 'contextUsageUpdate':
                 setContextUsage(message.usage);
                 break;

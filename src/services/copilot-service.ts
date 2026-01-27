@@ -213,6 +213,26 @@ export class CopilotService {
                 });
                 break;
 
+            case 'assistant.reasoning_delta':
+                // Streaming reasoning chunk
+                this.webview.postMessage({
+                    type: 'reasoningDelta',
+                    messageId: this.currentMessageId,
+                    reasoningId: event.data.reasoningId,
+                    deltaContent: event.data.deltaContent
+                });
+                break;
+
+            case 'assistant.reasoning':
+                // Complete reasoning - send the summary content
+                this.webview.postMessage({
+                    type: 'reasoningComplete',
+                    messageId: this.currentMessageId,
+                    reasoningId: event.data.reasoningId,
+                    content: event.data.content
+                });
+                break;
+
             case 'session.error':
                 // Session error - notify user and end generation
                 console.error('[CopilotService] Session error:', event.data.message);
