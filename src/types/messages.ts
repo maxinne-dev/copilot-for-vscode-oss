@@ -35,7 +35,8 @@ export type ServerMessage =
     | { type: 'clearHistory' }
     | { type: 'viewVisible' }
     | { type: 'sessionsLoaded'; recentSessions: SessionMetadata[]; otherSessions: SessionMetadata[] }
-    | { type: 'sessionResumed'; sessionId: string; messages: ChatMessage[] };
+    | { type: 'sessionResumed'; sessionId: string; messages: ChatMessage[] }
+    | { type: 'accessDenied'; reason: string };
 
 /**
  * Session metadata from Copilot SDK

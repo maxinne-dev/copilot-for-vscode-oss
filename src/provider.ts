@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CopilotService } from './services/copilot-service';
 import { CliService } from './services/cli-service';
+import { GuardService } from './services/guard-service';
 import { getNonce } from './utils/nonce';
 import { ClientMessage, ServerMessage, ModelOption, SessionMetadata, FileAttachment } from './types/messages';
 
@@ -129,6 +130,17 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async _onWebviewReady(): Promise<void> {
+        // Security Check
+        const guard = new GuardService();
+        const securityResult = await guard.validateEnvironment();
+        if (!securityResult.allowed) {
+            this._sendMessage({
+                type: 'accessDenied',
+                reason: securityResult.reason || 'Unauthorized environment.'
+            });
+            return; // Stop initialization if blocked
+        }
+
         // Initialize the Copilot service when webview is ready
         try {
             await this._copilotService.initialize();

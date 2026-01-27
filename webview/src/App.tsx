@@ -3,9 +3,12 @@ import ChatPanel from './components/ChatPanel';
 import { useVSCode } from './hooks/useVSCode';
 import { useExtensionMessage } from './hooks/useExtensionMessage';
 import type { ChatMessage, ModelCategory, FileAttachment, ModelOption, SessionMetadata } from './types';
+import AccessDeniedScreen from './components/AccessDeniedScreen';
 
 function App() {
     const vscode = useVSCode();
+
+    const [isBlocked, setIsBlocked] = useState(false);
 
     // State
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -48,6 +51,10 @@ function App() {
     // Handle messages from extension
     const handleMessage = useCallback((message: any) => {
         switch (message.type) {
+            case 'accessDenied':
+                setIsBlocked(true);
+                break;
+
             case 'init':
                 setModels(message.models);
                 if (message.defaultModel) {
@@ -253,6 +260,10 @@ function App() {
         vscode.postMessage({ type: 'resumeSession', sessionId });
         // Will switch to chat view and model will be updated when sessionResumed message is received
     };
+
+    if (isBlocked) {
+        return <AccessDeniedScreen />;
+    }
 
     return (
         <ChatPanel
