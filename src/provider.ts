@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { CopilotService } from './services/copilot-service';
-import { CliService } from './services/cli-service';
 import { GuardService } from './services/guard-service';
 import { getNonce } from './utils/nonce';
 import { ClientMessage, ServerMessage, ModelOption, SessionMetadata, FileAttachment } from './types/messages';
@@ -11,14 +10,11 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'copilot-oss.sidebar';
 
     private _view?: vscode.WebviewView;
-    private readonly _cliService: CliService;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _copilotService: CopilotService
-    ) {
-        this._cliService = new CliService();
-    }
+    ) { }
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -438,16 +434,33 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
 
     private async _handleRequestModels(): Promise<void> {
         try {
-            const modelIds = await this._cliService.getAvailableModels();
-            const models: ModelOption[] = modelIds.map(id => ({
-                id,
-                name: id, // Use raw model ID as display name
-                multiplier: '' // Hide multiplier for now
-            }));
+            const models = await this._copilotService.listModels();
+
+            // Separate models into Standard and Premium categories
+            const standardModels = models.filter(m => !m.isPremium);
+            const premiumModels = models.filter(m => m.isPremium);
+
+            // Build categories (only include non-empty categories)
+            const categories: { name: string; models: ModelOption[] }[] = [];
+
+            if (standardModels.length > 0) {
+                categories.push({
+                    name: 'Standard Models',
+                    models: standardModels
+                });
+            }
+
+            if (premiumModels.length > 0) {
+                categories.push({
+                    name: 'Premium Models',
+                    models: premiumModels
+                });
+            }
 
             this._sendMessage({
                 type: 'modelsLoaded',
-                models
+                models,
+                categories
             });
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to load models';

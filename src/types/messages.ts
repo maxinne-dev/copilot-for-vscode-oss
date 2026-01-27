@@ -28,7 +28,7 @@ export type ServerMessage =
     | { type: 'attachmentSelected'; files: FileAttachment[] }
     | { type: 'usageUpdate'; tokens: number; cost?: number }
     | { type: 'modelChanged'; modelId: string }
-    | { type: 'modelsLoaded'; models: ModelOption[] }
+    | { type: 'modelsLoaded'; models: ModelOption[]; categories?: ModelCategory[] }
     | { type: 'modelsError'; message: string }
     | { type: 'error'; message: string }
     | { type: 'generationComplete' }
@@ -111,6 +111,10 @@ export interface ModelOption {
     name: string;
     multiplier: string;
     included?: boolean;
+    isPremium?: boolean;         // From billing.is_premium
+    supportsVision?: boolean;    // From capabilities.supports.vision
+    isEnabled?: boolean;         // From policy.state === 'enabled'
+    restrictedTo?: string[];     // From billing.restricted_to
 }
 
 /**

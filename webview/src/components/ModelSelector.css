@@ -93,6 +93,29 @@
     color: var(--vscode-testing-iconPassed);
 }
 
+/* Model metadata container (right side) */
+.model-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Vision support icon */
+.model-vision-icon {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+}
+
+/* Disabled model state */
+.model-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.model-option.disabled:hover {
+    background: transparent;
+}
+
 .dropdown-footer {
     padding: 8px 12px;
     border-top: 1px solid var(--vscode-widget-border);

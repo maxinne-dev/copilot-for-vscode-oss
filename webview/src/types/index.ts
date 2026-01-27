@@ -47,6 +47,10 @@ export interface ModelOption {
     name: string;
     multiplier: string;
     included?: boolean;
+    isPremium?: boolean;         // From billing.is_premium
+    supportsVision?: boolean;    // From capabilities.supports.vision
+    isEnabled?: boolean;         // From policy.state === 'enabled'
+    restrictedTo?: string[];     // From billing.restricted_to
 }
 
 export interface WebviewState {

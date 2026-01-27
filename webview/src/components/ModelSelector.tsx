@@ -109,22 +109,32 @@ export default function ModelSelector({
                             {models.map((category) => (
                                 <div key={category.name} className="model-category">
                                     <div className="category-header">{category.name}</div>
-                                    {category.models.map((model) => (
-                                        <button
-                                            key={model.id}
-                                            className={`model-option ${model.id === selectedModelId ? 'selected' : ''}`}
-                                            onClick={() => handleSelect(model.id)}
-                                            role="option"
-                                            aria-selected={model.id === selectedModelId}
-                                        >
-                                            <span className="model-name">{model.name}</span>
-                                            {model.multiplier && (
-                                                <span className={`model-multiplier ${model.included ? 'included' : ''}`}>
-                                                    {model.included ? 'included' : model.multiplier}
+                                    {category.models.map((model) => {
+                                        const isDisabled = model.isEnabled === false;
+                                        return (
+                                            <button
+                                                key={model.id}
+                                                className={`model-option ${model.id === selectedModelId ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                                                onClick={() => !isDisabled && handleSelect(model.id)}
+                                                role="option"
+                                                aria-selected={model.id === selectedModelId}
+                                                aria-disabled={isDisabled}
+                                                title={isDisabled ? 'This model is not enabled for your account' : undefined}
+                                            >
+                                                <span className="model-name">{model.name}</span>
+                                                <span className="model-meta">
+                                                    {model.supportsVision && (
+                                                        <i className="codicon codicon-eye model-vision-icon" title="Supports vision"></i>
+                                                    )}
+                                                    {model.multiplier && (
+                                                        <span className={`model-multiplier ${model.included ? 'included' : ''}`}>
+                                                            {model.included ? 'included' : model.multiplier}
+                                                        </span>
+                                                    )}
                                                 </span>
-                                            )}
-                                        </button>
-                                    ))}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             ))}
                         </>

@@ -117,11 +117,16 @@ function App() {
                 break;
 
             case 'modelsLoaded':
-                // Create a single category with all loaded models
-                setModels([{
-                    name: 'Available Models',
-                    models: message.models as ModelOption[]
-                }]);
+                // Use pre-categorized models from backend if available
+                if (message.categories && message.categories.length > 0) {
+                    setModels(message.categories);
+                } else {
+                    // Fallback: create a single category with all models
+                    setModels([{
+                        name: 'Available Models',
+                        models: message.models as ModelOption[]
+                    }]);
+                }
                 setModelsLoading(false);
                 setModelsError(null);
                 break;

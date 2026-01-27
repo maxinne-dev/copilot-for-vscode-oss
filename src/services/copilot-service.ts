@@ -6,7 +6,7 @@ type CopilotSession = any;
 type SessionEvent = any;
 
 // Import types
-import type { FileAttachment, ChatMessage, ToolEvent } from '../types/messages';
+import type { FileAttachment, ChatMessage, ToolEvent, ModelOption } from '../types/messages';
 
 /**
  * Structure for grouping session events into conversation turns
@@ -456,6 +456,47 @@ export class CopilotService {
     }
 
     /**
+     * Lists all available models from the Copilot SDK
+     * Returns models with properties for categorization and display
+     */
+    async listModels(): Promise<ModelOption[]> {
+        if (!this.client) {
+            await this.initialize();
+        }
+
+        try {
+            const models = await this.client!.listModels();
+            console.log('[CopilotService] Listed models:', models.length);
+
+            // Transform SDK models to ModelOption format
+            const modelOptions: ModelOption[] = models.map((model: any) => ({
+                id: model.id,
+                name: model.name || model.id,
+                multiplier: model.billing?.multiplier ? `${model.billing.multiplier}x` : '',
+                isPremium: model.billing?.is_premium ?? false,
+                supportsVision: model.capabilities?.supports?.vision ?? false,
+                isEnabled: model.policy?.state === 'enabled',
+                restrictedTo: model.billing?.restricted_to
+            }));
+
+            // Sort: enabled models first, then alphabetically by name
+            modelOptions.sort((a, b) => {
+                // Enabled models come first
+                if (a.isEnabled !== b.isEnabled) {
+                    return a.isEnabled ? -1 : 1;
+                }
+                // Then sort alphabetically by name
+                return a.name.localeCompare(b.name);
+            });
+
+            return modelOptions;
+        } catch (error) {
+            console.error('[CopilotService] Failed to list models:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Resumes an existing session by ID and returns its messages with tool events
      */
     async resumeSession(sessionId: string, modelId?: string): Promise<ChatMessage[]> {
@@ -479,7 +520,9 @@ export class CopilotService {
             });
             this.session.on(this.handleEvent.bind(this));
             console.log(`[CopilotService] Resumed session: ${sessionId}`);
-            console.log('[CopilotService] Session:', this.session);
+
+            const models = await this.client!.listModels();
+            console.log('[CopilotService] Models:', JSON.stringify(models[0], null, 2));
 
             // Load all events from the session
             const events = await this.session.getMessages();
