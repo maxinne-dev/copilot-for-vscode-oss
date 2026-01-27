@@ -1,5 +1,6 @@
 import ModelSelector from './ModelSelector';
-import type { ModelCategory } from '../types';
+import ContextUsageIndicator from './ContextUsageIndicator';
+import type { ModelCategory, ContextUsageInfo } from '../types';
 import './BottomBar.css';
 
 interface BottomBarProps {
@@ -9,6 +10,7 @@ interface BottomBarProps {
     modelsError: string | null;
     onModelChange: (modelId: string) => void;
     onRequestModels: () => void;
+    contextUsage: ContextUsageInfo | null;
 }
 
 export default function BottomBar({
@@ -17,7 +19,8 @@ export default function BottomBar({
     modelsLoading,
     modelsError,
     onModelChange,
-    onRequestModels
+    onRequestModels,
+    contextUsage
 }: BottomBarProps) {
     return (
         <div className="bottom-bar">
@@ -35,6 +38,10 @@ export default function BottomBar({
                 onModelChange={onModelChange}
                 onRequestModels={onRequestModels}
             />
+
+            <div className="bottom-bar-spacer" />
+
+            <ContextUsageIndicator usage={contextUsage} />
         </div>
     );
 }

@@ -4,7 +4,7 @@ import SessionList from './SessionList';
 import InputArea from './InputArea';
 import HeaderBar from './HeaderBar';
 import BottomBar from './BottomBar';
-import type { ChatMessage, ModelCategory, FileAttachment, SessionMetadata } from '../types';
+import type { ChatMessage, ModelCategory, FileAttachment, SessionMetadata, ContextUsageInfo } from '../types';
 import './ChatPanel.css';
 
 interface ChatPanelProps {
@@ -20,6 +20,7 @@ interface ChatPanelProps {
     recentSessions: SessionMetadata[];
     otherSessions: SessionMetadata[];
     sessionsLoading: boolean;
+    contextUsage: ContextUsageInfo | null;
     onSend: (content: string) => void;
     onStop: () => void;
     onAttach: () => void;
@@ -54,7 +55,8 @@ export default function ChatPanel({
     onNewChat,
     onShowHistory,
     onSelectSession,
-    onAttachFolder
+    onAttachFolder,
+    contextUsage
 }: ChatPanelProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const userHasScrolled = useRef(false);
@@ -156,6 +158,7 @@ export default function ChatPanel({
                     modelsError={modelsError}
                     onModelChange={onModelChange}
                     onRequestModels={onRequestModels}
+                    contextUsage={contextUsage}
                 />
             </div>
         </div>

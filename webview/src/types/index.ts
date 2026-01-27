@@ -10,6 +10,13 @@ export interface FileAttachment {
     size?: number;
 }
 
+export interface ContextUsageInfo {
+    tokenLimit: number;
+    currentTokens: number;
+    messagesLength: number;
+    percentage: number;
+}
+
 export interface ProgressStep {
     id: string;
     label: string;

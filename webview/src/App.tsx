@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import ChatPanel from './components/ChatPanel';
 import { useVSCode } from './hooks/useVSCode';
 import { useExtensionMessage } from './hooks/useExtensionMessage';
-import type { ChatMessage, ModelCategory, FileAttachment, ModelOption, SessionMetadata } from './types';
+import type { ChatMessage, ModelCategory, FileAttachment, ModelOption, SessionMetadata, ContextUsageInfo } from './types';
 import AccessDeniedScreen from './components/AccessDeniedScreen';
 
 function App() {
@@ -26,6 +26,7 @@ function App() {
     const [otherSessions, setOtherSessions] = useState<SessionMetadata[]>([]);
     const [sessionsLoading, setSessionsLoading] = useState(false);
     const [shouldHonorClearHistory, setShouldHonorClearHistory] = useState(true);
+    const [contextUsage, setContextUsage] = useState<ContextUsageInfo | null>(null);
 
     // Restore state from webview persistence
     useEffect(() => {
@@ -182,6 +183,10 @@ function App() {
                     return msg;
                 }));
                 break;
+
+            case 'contextUsageUpdate':
+                setContextUsage(message.usage);
+                break;
         }
     }, []);
 
@@ -284,6 +289,7 @@ function App() {
             recentSessions={recentSessions}
             otherSessions={otherSessions}
             sessionsLoading={sessionsLoading}
+            contextUsage={contextUsage}
             onSend={handleSend}
             onStop={handleStop}
             onAttach={handleAttach}

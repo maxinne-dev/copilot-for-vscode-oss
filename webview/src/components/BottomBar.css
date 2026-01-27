@@ -5,6 +5,10 @@
     padding: 8px 12px;
 }
 
+.bottom-bar-spacer {
+    flex: 1;
+}
+
 .attach-button-container {
     display: flex;
 }

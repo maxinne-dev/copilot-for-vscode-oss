@@ -160,6 +160,21 @@ export class CopilotService {
                 this.currentMessageId = null;
                 break;
 
+            case 'session.usage_info':
+                // Context window usage info - forward to webview for display
+                const { tokenLimit, currentTokens, messagesLength } = event.data;
+                const percentage = tokenLimit > 0 ? Math.round((currentTokens / tokenLimit) * 100) : 0;
+                this.webview.postMessage({
+                    type: 'contextUsageUpdate',
+                    usage: {
+                        tokenLimit,
+                        currentTokens,
+                        messagesLength,
+                        percentage
+                    }
+                });
+                break;
+
             case 'tool.execution_start':
                 // Skip internal SDK tools
                 if (this.isInternalTool(event.data.toolName)) {

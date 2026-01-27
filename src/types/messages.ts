@@ -16,6 +16,16 @@ export type ClientMessage =
     | { type: 'resumeSession'; sessionId: string; modelId?: string };
 
 /**
+ * Context usage information from session
+ */
+export interface ContextUsageInfo {
+    tokenLimit: number;       // Max context window tokens
+    currentTokens: number;    // Tokens currently used
+    messagesLength: number;   // Number of messages in context
+    percentage: number;       // Pre-calculated percentage (0-100)
+}
+
+/**
  * Message types sent from Extension Host to Webview
  */
 export type ServerMessage =
@@ -27,6 +37,7 @@ export type ServerMessage =
     | { type: 'toolEvent'; messageId: string; event: ToolEvent }
     | { type: 'attachmentSelected'; files: FileAttachment[] }
     | { type: 'usageUpdate'; tokens: number; cost?: number }
+    | { type: 'contextUsageUpdate'; usage: ContextUsageInfo }
     | { type: 'modelChanged'; modelId: string }
     | { type: 'modelsLoaded'; models: ModelOption[]; categories?: ModelCategory[] }
     | { type: 'modelsError'; message: string }
