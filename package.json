@@ -24,7 +24,7 @@
         {
           "id": "copilot-chat-container",
           "title": "Copilot",
-          "icon": "media/chat-icon.svg"
+          "icon": "media/ghcp.svg"
         }
       ]
     },
@@ -34,7 +34,7 @@
           "type": "webview",
           "id": "copilot-oss.sidebar",
           "name": "Chat",
-          "icon": "media/chat-icon.svg"
+          "icon": "media/ghcp.svg"
         }
       ]
     },
