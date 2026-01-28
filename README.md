@@ -100,6 +100,10 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 
 This project is licensed under the [AGPL-3.0 License](LICENSE).
 
+## 🤖 AI Usage
+
+This was built with heavy assistance from AI tools. Most of it was implemented using **Google Antigravity** with various models, **Claude Code** VSCode plugin sometimes when AG quotas were exceeded, and **GitHub Copilot** for code review, analysis, and repository chores.
+
 ---
 
 <div align="center">
