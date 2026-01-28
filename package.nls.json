@@ -4,5 +4,5 @@
     "config.defaultModel.description": "Default AI model for new chat sessions",
     "config.apiProvider.description": "AI provider to use for chat completions",
     "viewsContainers.title": "Copilot",
-    "views.chat.name": "Chat"
+    "views.chat.name": "Copilot-OSS Chat"
 }

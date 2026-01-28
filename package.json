@@ -17,6 +17,11 @@
     "Machine Learning",
     "Chat"
   ],
+  "activationEvents": [
+    "onView:copilot-oss.sidebar",
+    "onCommand:copilot-oss.newSession",
+    "onCommand:copilot-oss.clearHistory"
+  ],
   "main": "./dist/extension.js",
   "l10n": "./locales",
   "contributes": {
