@@ -10,7 +10,7 @@
     "url": "https://github.com/your-username/copilot-for-oss.git"
   },
   "engines": {
-    "vscode": "^1.104.0"
+    "vscode": "^1.103.0"
   },
   "categories": [
     "Other",
@@ -92,7 +92,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.x",
-    "@types/vscode": "^1.104.0",
+    "@types/vscode": "^1.103.0",
     "@typescript-eslint/eslint-plugin": "^7.x",
     "@typescript-eslint/parser": "^7.x",
     "@vscode/test-electron": "^2.x",
