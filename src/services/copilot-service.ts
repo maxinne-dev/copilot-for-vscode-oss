@@ -175,7 +175,7 @@ export class CopilotService {
                 this.currentMessageId = null;
                 break;
 
-            case 'session.usage_info':
+            case 'session.usage_info': {
                 // Context window usage info - forward to webview for display
                 const { tokenLimit, currentTokens, messagesLength } = event.data;
                 const percentage = tokenLimit > 0 ? Math.round((currentTokens / tokenLimit) * 100) : 0;
@@ -189,6 +189,7 @@ export class CopilotService {
                     }
                 });
                 break;
+            }
 
             case 'tool.execution_start':
                 // Skip internal SDK tools
@@ -207,7 +208,7 @@ export class CopilotService {
                 });
                 break;
 
-            case 'tool.execution_complete':
+            case 'tool.execution_complete': {
                 // Get cached tool info since completion events don't include toolName
                 const cachedInfo = this.pendingToolCalls.get(event.data.toolCallId);
                 if (!cachedInfo) {
@@ -227,6 +228,7 @@ export class CopilotService {
                     event: this.createToolEvent(completeData, event.data.success ? 'success' : 'error')
                 });
                 break;
+            }
 
             case 'assistant.reasoning_delta':
                 // Streaming reasoning chunk
@@ -293,7 +295,7 @@ export class CopilotService {
         switch (toolName) {
             case 'view':  // SDK uses 'view' for file reading
             case 'read_file':
-            case 'view_file':
+            case 'view_file': {
                 const viewPath = this.extractFilePath(args);
                 label = status === 'loading'
                     ? `Reading ${this.getFileName(viewPath)}`
@@ -303,10 +305,11 @@ export class CopilotService {
                     details = `${lineCount} lines`;
                 }
                 break;
+            }
 
             case 'write_file':
             case 'write_to_file':
-            case 'create_file':
+            case 'create_file': {
                 const isCreate = toolName === 'create_file' || toolName === 'write_to_file';
                 const writePath = this.extractFilePath(args);
                 label = status === 'loading'
@@ -317,11 +320,12 @@ export class CopilotService {
                     details = `(+${lineCount})`;
                 }
                 break;
+            }
 
             case 'edit':  // Add 'edit' as a possible tool name
             case 'edit_file':
             case 'replace_file_content':
-            case 'multi_replace_file_content':
+            case 'multi_replace_file_content': {
                 const editPath = this.extractFilePath(args);
                 label = status === 'loading'
                     ? `Editing ${this.getFileName(editPath)}`
@@ -337,30 +341,34 @@ export class CopilotService {
                     }
                 }
                 break;
+            }
 
             case 'run_command':
-            case 'execute_command':
+            case 'execute_command': {
                 const cmd = args.command || args.CommandLine || '';
                 const truncatedCmd = cmd.length > 40 ? cmd.substring(0, 40) + '...' : cmd;
                 label = status === 'loading' ? 'Running command' : 'Ran command';
                 details = truncatedCmd;
                 break;
+            }
 
             case 'grep_search':
             case 'search':
-            case 'find_by_name':
+            case 'find_by_name': {
                 label = status === 'loading' ? `Searching` : `Searched`;
                 const query = args.query || args.pattern || args.Query || args.Pattern || '';
                 details = query.length > 30 ? query.substring(0, 30) + '...' : query;
                 break;
+            }
 
             case 'list_directory':
-            case 'list_dir':
+            case 'list_dir': {
                 const dirPath = this.extractFilePath(args) || args.DirectoryPath || args.directory || args.dir;
                 label = status === 'loading'
                     ? `Listing ${this.getFileName(dirPath)}`
                     : `Listed ${this.getFileName(dirPath)}`;
                 break;
+            }
 
             case 'web_search':
             case 'search_web':
@@ -558,7 +566,7 @@ export class CopilotService {
     /**
      * Resumes an existing session by ID and returns its messages with tool events
      */
-    async resumeSession(sessionId: string, modelId?: string): Promise<ChatMessage[]> {
+    async resumeSession(sessionId: string, _modelId?: string): Promise<ChatMessage[]> {
         if (!this.client) {
             await this.initialize();
         }
@@ -675,7 +683,7 @@ export class CopilotService {
                     const toolEvents: ToolEvent[] = [];
 
                     // Build tool events from execution pairs
-                    for (const [toolCallId, execution] of turn.toolExecutions) {
+                    for (const [_toolCallId, execution] of turn.toolExecutions) {
                         if (execution.start) {
                             // Merge start and complete data (same as live sessions)
                             const completeData = execution.complete ? {
