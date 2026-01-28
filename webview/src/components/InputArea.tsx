@@ -23,12 +23,31 @@ export default function InputArea({
     onRemoveAttachment
 }: InputAreaProps) {
     const [input, setInput] = useState('');
+    const [showAttachDropdown, setShowAttachDropdown] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const attachDropdownRef = useRef<HTMLDivElement>(null);
 
     // Focus textarea on mount
     useEffect(() => {
         textareaRef.current?.focus();
     }, []);
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (attachDropdownRef.current && !attachDropdownRef.current.contains(event.target as Node)) {
+                setShowAttachDropdown(false);
+            }
+        };
+
+        if (showAttachDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showAttachDropdown]);
 
     const handleSubmit = () => {
         const trimmed = input.trim();
@@ -43,6 +62,16 @@ export default function InputArea({
             e.preventDefault();
             handleSubmit();
         }
+    };
+
+    const handleAttachDirectory = () => {
+        setShowAttachDropdown(false);
+        onAttachFolder();
+    };
+
+    const handleAttachFiles = () => {
+        setShowAttachDropdown(false);
+        onAttach();
     };
 
     const canSend = input.trim().length > 0 && !isGenerating;
@@ -81,6 +110,7 @@ export default function InputArea({
                 />
 
                 <div className="input-actions">
+                    {/* Attach directory button - commented out as per requirement
                     <button
                         className="attach-button"
                         onClick={onAttachFolder}
@@ -89,15 +119,31 @@ export default function InputArea({
                     >
                         <i className="codicon codicon-folder"></i>
                     </button>
+                    */}
 
-                    <button
-                        className="attach-button"
-                        onClick={onAttach}
-                        title="Attach file"
-                        disabled={isGenerating}
-                    >
-                        <i className="codicon codicon-attach"></i>
-                    </button>
+                    <div className="attach-dropdown-container" ref={attachDropdownRef}>
+                        <button
+                            className="attach-button"
+                            onClick={() => setShowAttachDropdown(!showAttachDropdown)}
+                            title="Attach"
+                            disabled={isGenerating}
+                        >
+                            <i className="codicon codicon-attach"></i>
+                        </button>
+
+                        {showAttachDropdown && (
+                            <div className="attach-dropdown">
+                                <button className="attach-dropdown-item" onClick={handleAttachDirectory}>
+                                    <i className="codicon codicon-folder"></i>
+                                    <span>Directory</span>
+                                </button>
+                                <button className="attach-dropdown-item" onClick={handleAttachFiles}>
+                                    <i className="codicon codicon-file"></i>
+                                    <span>Files</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {isGenerating ? (
                         <button
