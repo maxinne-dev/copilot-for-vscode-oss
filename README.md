@@ -59,23 +59,23 @@ Before you begin, ensure you have the following secure environment:
 Search for `Copilot for VS Code OSS` in your editor's extension marketplace.
 
 ### Manual Installation (VSIX)
-1.  Download the latest `.vsix` release from the [Releases](https://github.com/yourusername/copilot-vscode-oss/releases) page.
+1.  Download the latest `.vsix` release from the [Releases](https://github.com/maxinne-dev/copilot-for-vscode-oss/releases) page.
 2.  In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
 3.  Type `Extensions: Install from VSIX...` and select the downloaded file.
 
 ### Building from Source
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/copilot-vscode-oss.git
-cd copilot-vscode-oss/copilot-for-vscode-oss
+git clone https://github.com/maxinne-dev/copilot-for-vscode-oss.git
+cd copilot-for-vscode-oss
 
 # 2. Install dependencies
 npm install
 cd webview && npm install && cd ..
 
-# 3. Package the extension
-npm run package
-# This generates a .vsix file in the directory
+# 3. Compile the extension
+npm run compile
+# This generates the compiled files in the dist/ directory
 ```
 
 ## ⚙️ Configuration
@@ -84,7 +84,7 @@ Customize your experience in VS Code Settings (`Ctrl+,`):
 
 | Setting | Default | Description |
 | :--- | :--- | :--- |
-| `aiChat.defaultModel` | `gpt-4.1` | The default model to use for new sessions. |
+| `copilot-oss.defaultModel` | `gpt-4.1` | The default model to use for new sessions. |
 
 ## 🧭 Roadmap
 
@@ -94,7 +94,14 @@ Customize your experience in VS Code Settings (`Ctrl+,`):
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to set up your development environment and submit pull requests.
+We welcome contributions! To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and test them
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
 
 ## 📄 License
 
