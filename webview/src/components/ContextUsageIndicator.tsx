@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import './ContextUsageIndicator.css';
 
 interface ContextUsageInfo {
@@ -12,10 +13,12 @@ interface ContextUsageIndicatorProps {
 }
 
 export default function ContextUsageIndicator({ usage }: ContextUsageIndicatorProps) {
+    const { t } = useTranslation();
+
     if (!usage) {
         return (
             <div className="context-usage-indicator no-data">
-                <span className="context-usage-text">No context data</span>
+                <span className="context-usage-text">{t('context.noData')}</span>
             </div>
         );
     }
@@ -45,7 +48,12 @@ export default function ContextUsageIndicator({ usage }: ContextUsageIndicatorPr
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
-    const tooltipContent = `Context Usage: ${percentage}%\n${formatTokens(currentTokens)} / ${formatTokens(tokenLimit)} tokens\n${messagesLength} messages`;
+    const tooltipContent = t('context.tooltip', {
+        percentage,
+        current: formatTokens(currentTokens),
+        limit: formatTokens(tokenLimit),
+        messages: messagesLength
+    });
 
     return (
         <div
@@ -76,7 +84,7 @@ export default function ContextUsageIndicator({ usage }: ContextUsageIndicatorPr
                     transform="rotate(-90 8 8)"
                 />
             </svg>
-            <span className="context-usage-text">{percentage}% used</span>
+            <span className="context-usage-text">{t('context.used', { percentage })}</span>
         </div>
     );
 }

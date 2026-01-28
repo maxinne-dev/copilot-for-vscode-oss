@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ModelCategory } from '../types';
 import './ModelSelector.css';
 
@@ -19,6 +20,7 @@ export default function ModelSelector({
     onModelChange,
     onRequestModels
 }: ModelSelectorProps) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const hasRequestedModels = useRef(false);
@@ -93,7 +95,7 @@ export default function ModelSelector({
                     {modelsLoading ? (
                         <div className="models-loading">
                             <i className="codicon codicon-loading codicon-modifier-spin"></i>
-                            <span>Loading models...</span>
+                            <span>{t('model.loadingModels')}</span>
                         </div>
                     ) : modelsError ? (
                         <div className="models-error">
@@ -101,7 +103,7 @@ export default function ModelSelector({
                             <span>{modelsError}</span>
                             <button className="retry-button" onClick={handleRetry}>
                                 <i className="codicon codicon-refresh"></i>
-                                Retry
+                                {t('model.retry')}
                             </button>
                         </div>
                     ) : (
@@ -119,16 +121,16 @@ export default function ModelSelector({
                                                 role="option"
                                                 aria-selected={model.id === selectedModelId}
                                                 aria-disabled={isDisabled}
-                                                title={isDisabled ? 'This model is not enabled for your account' : undefined}
+                                                title={isDisabled ? t('model.modelDisabled') : undefined}
                                             >
                                                 <span className="model-name">{model.name}</span>
                                                 <span className="model-meta">
                                                     {model.supportsVision && (
-                                                        <i className="codicon codicon-eye model-vision-icon" title="Supports vision"></i>
+                                                        <i className="codicon codicon-eye model-vision-icon" title={t('model.supportsVision')}></i>
                                                     )}
                                                     {model.multiplier && (
                                                         <span className={`model-multiplier ${model.included ? 'included' : ''}`}>
-                                                            {model.included ? 'included' : model.multiplier}
+                                                            {model.included ? t('model.included') : model.multiplier}
                                                         </span>
                                                     )}
                                                 </span>

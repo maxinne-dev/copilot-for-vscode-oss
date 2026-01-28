@@ -18,12 +18,13 @@
     "Chat"
   ],
   "main": "./dist/extension.js",
+  "l10n": "./locales",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
           "id": "copilot-chat-container",
-          "title": "Copilot",
+          "title": "%viewsContainers.title%",
           "icon": "media/ghcp.svg"
         }
       ]
@@ -33,7 +34,7 @@
         {
           "type": "webview",
           "id": "copilot-oss.sidebar",
-          "name": "Chat",
+          "name": "%views.chat.name%",
           "icon": "media/ghcp.svg"
         }
       ]
@@ -44,7 +45,7 @@
         "copilot-oss.defaultModel": {
           "type": "string",
           "default": "gpt-4.1",
-          "description": "Default AI model for new chat sessions"
+          "description": "%config.defaultModel.description%"
         },
         "copilot-oss.apiProvider": {
           "type": "string",
@@ -56,19 +57,19 @@
             "local"
           ],
           "default": "copilot",
-          "description": "AI provider to use for chat completions"
+          "description": "%config.apiProvider.description%"
         }
       }
     },
     "commands": [
       {
         "command": "copilot-oss.newSession",
-        "title": "New Chat Session",
+        "title": "%command.newSession.title%",
         "icon": "$(add)"
       },
       {
         "command": "copilot-oss.clearHistory",
-        "title": "Clear Chat History",
+        "title": "%command.clearHistory.title%",
         "icon": "$(clear-all)"
       }
     ]

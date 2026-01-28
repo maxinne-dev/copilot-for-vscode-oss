@@ -154,7 +154,8 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
             type: 'init',
             models: this._getAvailableModels(),
             history: [], // Will be loaded from webview state
-            defaultModel
+            defaultModel,
+            locale: vscode.env.language
         });
     }
 
@@ -214,19 +215,19 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         // Show warning if no workspace is open
         if (!hasWorkspace) {
             const proceed = await vscode.window.showWarningMessage(
-                'No workspace is open. Attaching files from outside a workspace may result in unsafe operations. Continue?',
+                vscode.l10n.t('No workspace is open. Attaching files from outside a workspace may result in unsafe operations. Continue?'),
                 { modal: true },
-                'Continue',
-                'Cancel'
+                vscode.l10n.t('Continue'),
+                vscode.l10n.t('Cancel')
             );
-            if (proceed !== 'Continue') {
+            if (proceed !== vscode.l10n.t('Continue')) {
                 return;
             }
         }
 
         const uris = await vscode.window.showOpenDialog({
             canSelectMany: true,
-            openLabel: 'Attach',
+            openLabel: vscode.l10n.t('Attach'),
             defaultUri: workspaceFolder,
             filters: {
                 'Code Files': ['ts', 'js', 'tsx', 'jsx', 'py', 'java', 'cpp', 'c', 'h', 'cs', 'go', 'rs', 'rb', 'php'],
@@ -280,7 +281,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         // Show error for blocked files (outside workspace)
         if (blockedPaths.length > 0) {
             vscode.window.showErrorMessage(
-                `Blocked for security: ${blockedPaths.join(', ')}. Only files within the workspace can be attached to prevent unsafe operations.`,
+                vscode.l10n.t('Blocked for security: {0}. Only files within the workspace can be attached to prevent unsafe operations.', blockedPaths.join(', ')),
                 { modal: false }
             );
         }
@@ -288,7 +289,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         // Show warning if some paths were invalid
         if (invalidPaths.length > 0) {
             vscode.window.showWarningMessage(
-                `Could not attach: ${invalidPaths.join(', ')}`,
+                vscode.l10n.t('Could not attach: {0}', invalidPaths.join(', ')),
                 { modal: false }
             );
         }
@@ -303,12 +304,12 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         // Show warning if no workspace is open
         if (!hasWorkspace) {
             const proceed = await vscode.window.showWarningMessage(
-                'No workspace is open. Attaching folders from outside a workspace may result in unsafe operations. Continue?',
+                vscode.l10n.t('No workspace is open. Attaching folders from outside a workspace may result in unsafe operations. Continue?'),
                 { modal: true },
-                'Continue',
-                'Cancel'
+                vscode.l10n.t('Continue'),
+                vscode.l10n.t('Cancel')
             );
-            if (proceed !== 'Continue') {
+            if (proceed !== vscode.l10n.t('Continue')) {
                 return;
             }
         }
@@ -317,14 +318,14 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
             canSelectMany: true,
             canSelectFolders: true,
             canSelectFiles: false,
-            openLabel: 'Attach Folder',
+            openLabel: vscode.l10n.t('Attach Folder'),
             defaultUri: workspaceFolder
         });
 
         // Check if user cancelled or didn't select anything
         if (!uris || uris.length === 0) {
             vscode.window.showInformationMessage(
-                'No folder selected. Tip: Click once on a folder to highlight it, then click "Attach Folder".',
+                vscode.l10n.t("No folder selected. Tip: Click once on a folder to highlight it, then click 'Attach Folder'."),
                 { modal: false }
             );
             return;
@@ -391,7 +392,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         // Show specific warning for the Windows folder picker bug
         if (editorDirDetected && validFolders.length === 0 && blockedPaths.length === 0) {
             vscode.window.showWarningMessage(
-                'No folder was selected. Tip: Click once on a folder to highlight it, then click "Attach Folder". Don\'t double-click into the folder first.',
+                vscode.l10n.t("No folder was selected. Tip: Click once on a folder to highlight it, then click 'Attach Folder'. Don't double-click into the folder first."),
                 { modal: false }
             );
             return;
@@ -408,7 +409,7 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
         // Show error for blocked folders (outside workspace)
         if (blockedPaths.length > 0) {
             vscode.window.showErrorMessage(
-                `Blocked for security: ${blockedPaths.join(', ')}. Only folders within the workspace can be attached to prevent unsafe operations.`,
+                vscode.l10n.t('Blocked for security: {0}. Only folders within the workspace can be attached to prevent unsafe operations.', blockedPaths.join(', ')),
                 { modal: false }
             );
         }

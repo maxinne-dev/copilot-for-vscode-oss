@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import TextareaAutosize from 'react-textarea-autosize';
 import type { FileAttachment } from '../types';
 import './InputArea.css';
@@ -26,6 +27,7 @@ export default function InputArea({
     onRemoveAttachment,
     onSystemMessageClick
 }: InputAreaProps) {
+    const { t } = useTranslation();
     const [input, setInput] = useState('');
     const [showAttachDropdown, setShowAttachDropdown] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -91,7 +93,7 @@ export default function InputArea({
                             <button
                                 className="remove-attachment"
                                 onClick={() => onRemoveAttachment(file.path)}
-                                title="Remove attachment"
+                                title={t('input.removeAttachment')}
                             >
                                 <i className="codicon codicon-close"></i>
                             </button>
@@ -104,7 +106,7 @@ export default function InputArea({
                 <TextareaAutosize
                     ref={textareaRef}
                     className="message-input"
-                    placeholder="Edit files in your workspace in agent mode"
+                    placeholder={t('input.placeholder')}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -118,7 +120,7 @@ export default function InputArea({
                     <button
                         className="attach-button"
                         onClick={onSystemMessageClick}
-                        title={hasMessages ? "System message can only be set before starting a chat" : "Custom system message"}
+                        title={hasMessages ? t('input.systemMessageDisabled') : t('input.systemMessageActive')}
                         disabled={isGenerating || hasMessages}
                     >
                         <i className="codicon codicon-comment-discussion-sparkle"></i>
@@ -128,7 +130,7 @@ export default function InputArea({
                         <button
                             className="attach-button"
                             onClick={() => setShowAttachDropdown(!showAttachDropdown)}
-                            title="Attach"
+                            title={t('input.attach')}
                             disabled={isGenerating}
                         >
                             <i className="codicon codicon-attach"></i>
@@ -138,11 +140,11 @@ export default function InputArea({
                             <div className="attach-dropdown">
                                 <button className="attach-dropdown-item" onClick={handleAttachDirectory}>
                                     <i className="codicon codicon-folder"></i>
-                                    <span>Directory</span>
+                                    <span>{t('input.directory')}</span>
                                 </button>
                                 <button className="attach-dropdown-item" onClick={handleAttachFiles}>
                                     <i className="codicon codicon-file"></i>
-                                    <span>Files</span>
+                                    <span>{t('input.files')}</span>
                                 </button>
                             </div>
                         )}
@@ -152,7 +154,7 @@ export default function InputArea({
                         <button
                             className="send-button stop"
                             onClick={onStop}
-                            title="Stop generation"
+                            title={t('input.stopGeneration')}
                         >
                             <i className="codicon codicon-primitive-square"></i>
                         </button>
@@ -161,7 +163,7 @@ export default function InputArea({
                             className={`send-button ${canSend ? 'active' : ''}`}
                             onClick={handleSubmit}
                             disabled={!canSend}
-                            title="Send message"
+                            title={t('input.sendMessage')}
                         >
                             <i className="codicon codicon-send"></i>
                         </button>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { SessionMetadata } from '../types';
 import './WelcomeScreen.css';
 
@@ -10,41 +11,47 @@ interface WelcomeScreenProps {
 }
 
 /**
- * Formats a date as a relative time string (e.g., "14 hrs ago", "3 wks ago")
+ * Formats a date as a relative time string using i18n
  */
-function formatRelativeTime(date: Date): string {
-    const now = Date.now();
-    const timestamp = new Date(date).getTime();
-    const diffMs = now - timestamp;
-    const diffSeconds = Math.floor(diffMs / 1000);
-    const diffMinutes = Math.floor(diffSeconds / 60);
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    const diffWeeks = Math.floor(diffDays / 7);
+function useRelativeTimeFormatter() {
+    const { t } = useTranslation();
 
-    if (diffMinutes < 1) {
-        return 'just now';
-    } else if (diffMinutes < 60) {
-        return `${diffMinutes} min${diffMinutes !== 1 ? 's' : ''} ago`;
-    } else if (diffHours < 24) {
-        return `${diffHours} hr${diffHours !== 1 ? 's' : ''} ago`;
-    } else if (diffDays < 7) {
-        return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
-    } else {
-        return `${diffWeeks} wk${diffWeeks !== 1 ? 's' : ''} ago`;
-    }
+    return (date: Date): string => {
+        const now = Date.now();
+        const timestamp = new Date(date).getTime();
+        const diffMs = now - timestamp;
+        const diffSeconds = Math.floor(diffMs / 1000);
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        const diffWeeks = Math.floor(diffDays / 7);
+
+        if (diffMinutes < 1) {
+            return t('time.justNow');
+        } else if (diffMinutes < 60) {
+            return t(diffMinutes === 1 ? 'time.minutesAgo' : 'time.minutesAgo_plural', { count: diffMinutes });
+        } else if (diffHours < 24) {
+            return t(diffHours === 1 ? 'time.hoursAgo' : 'time.hoursAgo_plural', { count: diffHours });
+        } else if (diffDays < 7) {
+            return t(diffDays === 1 ? 'time.daysAgo' : 'time.daysAgo_plural', { count: diffDays });
+        } else {
+            return t(diffWeeks === 1 ? 'time.weeksAgo' : 'time.weeksAgo_plural', { count: diffWeeks });
+        }
+    };
 }
 
 /**
  * Gets a display title for the session
- * Uses summary if available, otherwise falls back to session ID
  */
-function getSessionTitle(session: SessionMetadata): string {
-    if (session.summary && session.summary.trim()) {
-        return session.summary;
-    }
-    // Fallback to a truncated session ID
-    return `Session ${session.sessionId.substring(0, 8)}...`;
+function useSessionTitle() {
+    const { t } = useTranslation();
+
+    return (session: SessionMetadata): string => {
+        if (session.summary && session.summary.trim()) {
+            return session.summary;
+        }
+        return t('welcome.session', { id: session.sessionId.substring(0, 8) });
+    };
 }
 
 export default function WelcomeScreen({
@@ -54,16 +61,19 @@ export default function WelcomeScreen({
     onSelectSession,
     onNewChat
 }: WelcomeScreenProps) {
+    const { t } = useTranslation();
+    const formatRelativeTime = useRelativeTimeFormatter();
+    const getSessionTitle = useSessionTitle();
     const hasAnySessions = recentSessions.length > 0 || otherSessions.length > 0;
 
     return (
         <div className="welcome-screen">
-            <h2 className="welcome-header">Select a conversation</h2>
+            <h2 className="welcome-header">{t('welcome.selectConversation')}</h2>
 
             {isLoading && (
                 <div className="loading-indicator">
                     <i className="codicon codicon-loading codicon-spin"></i>
-                    <span>Loading sessions...</span>
+                    <span>{t('welcome.loadingSessions')}</span>
                 </div>
             )}
 
@@ -72,10 +82,10 @@ export default function WelcomeScreen({
                     <div className="empty-icon">
                         <i className="codicon codicon-comment-discussion"></i>
                     </div>
-                    <p>No previous conversations</p>
+                    <p>{t('welcome.noPreviousConversations')}</p>
                     <button className="new-chat-button" onClick={onNewChat}>
                         <i className="codicon codicon-add"></i>
-                        Start a new chat
+                        {t('welcome.startNewChat')}
                     </button>
                 </div>
             )}
@@ -84,7 +94,7 @@ export default function WelcomeScreen({
                 <>
                     {recentSessions.length > 0 && (
                         <div className="session-section">
-                            <h3 className="section-header">Recent</h3>
+                            <h3 className="section-header">{t('welcome.recent')}</h3>
                             <ul className="session-list">
                                 {recentSessions.map((session) => (
                                     <li key={session.sessionId} className="session-item">
@@ -99,7 +109,7 @@ export default function WelcomeScreen({
                                                 <span className="session-time">
                                                     {formatRelativeTime(session.modifiedTime)}
                                                 </span>
-                                                <i className="codicon codicon-copy session-copy-icon" title="Copy"></i>
+                                                <i className="codicon codicon-copy session-copy-icon" title={t('welcome.copy')}></i>
                                             </span>
                                         </button>
                                     </li>
@@ -110,7 +120,7 @@ export default function WelcomeScreen({
 
                     {otherSessions.length > 0 && (
                         <div className="session-section">
-                            <h3 className="section-header">Other Conversations</h3>
+                            <h3 className="section-header">{t('welcome.otherConversations')}</h3>
                             <ul className="session-list">
                                 {otherSessions.slice(0, 3).map((session) => (
                                     <li key={session.sessionId} className="session-item">
@@ -125,7 +135,7 @@ export default function WelcomeScreen({
                                                 <span className="session-time">
                                                     {formatRelativeTime(session.modifiedTime)}
                                                 </span>
-                                                <i className="codicon codicon-copy session-copy-icon" title="Copy"></i>
+                                                <i className="codicon codicon-copy session-copy-icon" title={t('welcome.copy')}></i>
                                             </span>
                                         </button>
                                     </li>
@@ -133,7 +143,7 @@ export default function WelcomeScreen({
                             </ul>
                             {otherSessions.length > 3 && (
                                 <button className="show-more-button">
-                                    Show {otherSessions.length - 3} more...
+                                    {t('welcome.showMore', { count: otherSessions.length - 3 })}
                                 </button>
                             )}
                         </div>

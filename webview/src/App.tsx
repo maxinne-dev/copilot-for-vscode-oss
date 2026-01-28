@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import ChatPanel from './components/ChatPanel';
 import { useVSCode } from './hooks/useVSCode';
 import { useExtensionMessage } from './hooks/useExtensionMessage';
+import { setLocale } from './i18n/i18n';
 import type { ChatMessage, ModelCategory, FileAttachment, ModelOption, SessionMetadata, ContextUsageInfo } from './types';
 import AccessDeniedScreen from './components/AccessDeniedScreen';
 
@@ -61,6 +62,9 @@ function App() {
                 setModels(message.models);
                 if (message.defaultModel) {
                     setSelectedModelId(message.defaultModel);
+                }
+                if (message.locale) {
+                    setLocale(message.locale);
                 }
                 break;
 

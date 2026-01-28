@@ -1,4 +1,5 @@
 import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import MessageList from './MessageList';
 import SessionList from './SessionList';
 import InputArea from './InputArea';
@@ -63,6 +64,7 @@ export default function ChatPanel({
     customSystemMessage,
     onSystemMessageChange
 }: ChatPanelProps) {
+    const { t } = useTranslation();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const userHasScrolled = useRef(false);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -119,10 +121,9 @@ export default function ChatPanel({
                     <div className="welcome-icon">
                         <i className="codicon codicon-sparkle"></i>
                     </div>
-                    <h2>How can I help you?</h2>
+                    <h2>{t('chat.welcome')}</h2>
                     <p className="disclaimer">
-                        I'm powered by AI, so surprises and mistakes are possible.
-                        Make sure to verify any generated code or suggestions.
+                        {t('chat.disclaimer')}
                     </p>
                 </div>
             );

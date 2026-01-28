@@ -38,7 +38,7 @@ export interface ReasoningBlock {
  * Message types sent from Extension Host to Webview
  */
 export type ServerMessage =
-    | { type: 'init'; models: ModelCategory[]; history: ChatMessage[]; defaultModel?: string }
+    | { type: 'init'; models: ModelCategory[]; history: ChatMessage[]; defaultModel?: string; locale: string }
     | { type: 'addMessage'; id: string; role: 'user' | 'assistant'; content: string; model?: string }
     | { type: 'streamChunk'; messageId: string; content: string }
     | { type: 'streamEnd'; messageId: string }

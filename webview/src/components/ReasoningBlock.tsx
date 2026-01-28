@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ReasoningBlock as ReasoningBlockType } from '../types';
 import './ReasoningBlock.css';
 
@@ -7,6 +8,7 @@ interface ReasoningBlockProps {
 }
 
 export default function ReasoningBlock({ reasoning }: ReasoningBlockProps) {
+    const { t } = useTranslation();
     const contentRef = useRef<HTMLDivElement>(null);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -27,7 +29,7 @@ export default function ReasoningBlock({ reasoning }: ReasoningBlockProps) {
                     aria-expanded={isExpanded}
                 >
                     <i className="codicon codicon-sparkle reasoning-icon" />
-                    <span className="reasoning-label">Thought for a moment</span>
+                    <span className="reasoning-label">{t('reasoning.thoughtForAMoment')}</span>
                     <i className={`codicon ${isExpanded ? 'codicon-chevron-up' : 'codicon-chevron-down'} reasoning-chevron`} />
                 </button>
                 {isExpanded && (
@@ -44,7 +46,7 @@ export default function ReasoningBlock({ reasoning }: ReasoningBlockProps) {
         <div className="reasoning-block streaming">
             <div className="reasoning-header">
                 <i className="codicon codicon-loading codicon-modifier-spin reasoning-icon" />
-                <span className="reasoning-label">Thinking...</span>
+                <span className="reasoning-label">{t('reasoning.thinking')}</span>
             </div>
             <div
                 ref={contentRef}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import './HeaderBar.css';
 
 interface HeaderBarProps {
@@ -6,9 +7,11 @@ interface HeaderBarProps {
 }
 
 export default function HeaderBar({ onNewChat, onShowHistory }: HeaderBarProps) {
+    const { t } = useTranslation();
+
     return (
         <div className="header-bar">
-            <span className="session-title">Copilot for OSS</span>
+            <span className="session-title">{t('header.title')}</span>
             <div className="header-actions">
                 {/* <button
                     className="icon-button"
@@ -19,16 +22,16 @@ export default function HeaderBar({ onNewChat, onShowHistory }: HeaderBarProps) 
                 </button> */}
                 <button
                     className="icon-button"
-                    title="Chat history"
-                    aria-label="Chat history"
+                    title={t('header.history')}
+                    aria-label={t('header.history')}
                     onClick={onShowHistory}
                 >
                     <i className="codicon codicon-history"></i>
                 </button>
                 <button
                     className="icon-button"
-                    title="New chat"
-                    aria-label="New chat"
+                    title={t('header.newChat')}
+                    aria-label={t('header.newChat')}
                     onClick={onNewChat}
                 >
                     <i className="codicon codicon-add"></i>
@@ -37,4 +40,3 @@ export default function HeaderBar({ onNewChat, onShowHistory }: HeaderBarProps) 
         </div>
     );
 }
-

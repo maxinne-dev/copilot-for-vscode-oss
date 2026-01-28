@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './SystemMessageModal.css';
 
 interface SystemMessageModalProps {
@@ -14,6 +15,7 @@ export default function SystemMessageModal({
     onClose,
     onApply
 }: SystemMessageModalProps) {
+    const { t } = useTranslation();
     const [value, setValue] = useState(initialValue);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -54,7 +56,7 @@ export default function SystemMessageModal({
         <div className="system-message-overlay" onClick={handleOverlayClick}>
             <div className="system-message-modal">
                 <div className="system-message-header">
-                    <h3>Custom System Message</h3>
+                    <h3>{t('modal.customSystemMessage')}</h3>
                 </div>
                 <div className="system-message-body">
                     <textarea
@@ -62,16 +64,16 @@ export default function SystemMessageModal({
                         className="system-message-textarea"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
-                        placeholder="Enter custom instructions for the AI assistant..."
+                        placeholder={t('modal.placeholder')}
                         rows={6}
                     />
                 </div>
                 <div className="system-message-footer">
                     <button className="modal-button cancel" onClick={onClose}>
-                        Cancel
+                        {t('modal.cancel')}
                     </button>
                     <button className="modal-button apply" onClick={handleApply}>
-                        Apply
+                        {t('modal.apply')}
                     </button>
                 </div>
             </div>

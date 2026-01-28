@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -31,6 +32,7 @@ interface MessageItemProps {
 }
 
 function MessageItem({ message, isStreaming }: MessageItemProps) {
+    const { t } = useTranslation();
     const isUser = message.role === 'user';
 
     return (
@@ -84,7 +86,7 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
                                                     <button
                                                         className="copy-button"
                                                         onClick={() => navigator.clipboard.writeText(codeString)}
-                                                        title="Copy code"
+                                                        title={t('message.copyCode')}
                                                     >
                                                         <i className="codicon codicon-copy"></i>
                                                     </button>
@@ -128,7 +130,7 @@ function MessageItem({ message, isStreaming }: MessageItemProps) {
             )}
             {!isStreaming && !isUser && (
                 <div className="message-actions">
-                    <button className="action-button" title="Copy">
+                    <button className="action-button" title={t('message.copy')}>
                         <i className="codicon codicon-copy"></i>
                     </button>
                     {/*<button className="action-button" title="Good response">*/}
