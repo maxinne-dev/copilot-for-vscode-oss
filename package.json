@@ -2,12 +2,15 @@
   "name": "copilot-for-vscode-oss",
   "displayName": "Copilot for VSCode OSS",
   "description": "Copilot for VSCode OSS using GitHub Copilot SDK integration",
-  "version": "0.1.0",
-  "publisher": "maxie.homri.ch",
-  "license": "MIT",
+  "version": "1.0.0",
+  "author": {
+    "name": "Maxie Homrich",
+    "url": "https://github.com/maxinne-dev"
+  },
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/copilot-for-oss.git"
+    "url": "https://github.com/maxinne-dev/copilot-for-vscode-oss"
   },
   "engines": {
     "vscode": "^1.103.0"
@@ -51,18 +54,6 @@
           "type": "string",
           "default": "gpt-4.1",
           "description": "%config.defaultModel.description%"
-        },
-        "copilot-oss.apiProvider": {
-          "type": "string",
-          "enum": [
-            "copilot",
-            "openai",
-            "anthropic",
-            "google",
-            "local"
-          ],
-          "default": "copilot",
-          "description": "%config.apiProvider.description%"
         }
       }
     },
