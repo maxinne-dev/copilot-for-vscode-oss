@@ -1,9 +1,10 @@
-import { useRef, useEffect, useLayoutEffect } from 'react';
+import { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import MessageList from './MessageList';
 import SessionList from './SessionList';
 import InputArea from './InputArea';
 import HeaderBar from './HeaderBar';
 import BottomBar from './BottomBar';
+import SystemMessageModal from './SystemMessageModal';
 import type { ChatMessage, ModelCategory, FileAttachment, SessionMetadata, ContextUsageInfo } from '../types';
 import './ChatPanel.css';
 
@@ -31,6 +32,8 @@ interface ChatPanelProps {
     onNewChat: () => void;
     onShowHistory: () => void;
     onSelectSession: (sessionId: string) => void;
+    customSystemMessage: string;
+    onSystemMessageChange: (message: string) => void;
 }
 
 export default function ChatPanel({
@@ -56,11 +59,14 @@ export default function ChatPanel({
     onShowHistory,
     onSelectSession,
     onAttachFolder,
-    contextUsage
+    contextUsage,
+    customSystemMessage,
+    onSystemMessageChange
 }: ChatPanelProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const userHasScrolled = useRef(false);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const [isSystemMessageModalOpen, setIsSystemMessageModalOpen] = useState(false);
 
     // Auto-scroll to bottom when new messages arrive
     useLayoutEffect(() => {
@@ -144,11 +150,13 @@ export default function ChatPanel({
                 <InputArea
                     attachments={attachments}
                     isGenerating={isGenerating}
+                    hasMessages={!showSessionList && messages.length > 0}
                     onSend={onSend}
                     onStop={onStop}
                     onAttach={onAttach}
                     onAttachFolder={onAttachFolder}
                     onRemoveAttachment={onRemoveAttachment}
+                    onSystemMessageClick={() => setIsSystemMessageModalOpen(true)}
                 />
 
                 <BottomBar
@@ -161,6 +169,13 @@ export default function ChatPanel({
                     contextUsage={contextUsage}
                 />
             </div>
+
+            <SystemMessageModal
+                isOpen={isSystemMessageModalOpen}
+                initialValue={customSystemMessage}
+                onClose={() => setIsSystemMessageModalOpen(false)}
+                onApply={onSystemMessageChange}
+            />
         </div>
     );
 }

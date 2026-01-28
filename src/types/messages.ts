@@ -3,7 +3,7 @@
  */
 export type ClientMessage =
     | { type: 'ready' }
-    | { type: 'sendMessage'; message: string; modelId: string; attachments: FileAttachment[] }
+    | { type: 'sendMessage'; message: string; modelId: string; attachments: FileAttachment[]; systemMessage?: string }
     | { type: 'stopGeneration' }
     | { type: 'requestFileAttachment' }
     | { type: 'removeAttachment'; path: string }

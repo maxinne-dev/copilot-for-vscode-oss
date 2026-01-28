@@ -36,6 +36,8 @@ export class CopilotService {
     private CopilotClientClass: any = null;
     // Track pending tool calls so completion events can access tool info
     private pendingToolCalls: Map<string, { toolName: string; arguments: any }> = new Map();
+    // Track current system message for session
+    private currentSystemMessage: string | undefined = undefined;
 
     /**
      * Sets the webview instance for sending messages
@@ -90,9 +92,9 @@ export class CopilotService {
     }
 
     /**
-     * Creates a new session with the specified model
+     * Creates a new session with the specified model and optional system message
      */
-    async createSession(model: string): Promise<void> {
+    async createSession(model: string, systemMessage?: string): Promise<void> {
         if (!this.client) {
             await this.initialize();
         }
@@ -103,19 +105,32 @@ export class CopilotService {
         }
 
         try {
-            // Create session with the SDK
-            this.session = await this.client!.createSession({
+            // Build session configuration
+            const sessionConfig: any = {
                 model,
                 streaming: true,
-            });
+            };
+
+            // Add custom system message if provided using 'append' mode
+            // This adds to (not replaces) the SDK's default system message
+            if (systemMessage && systemMessage.trim()) {
+                sessionConfig.systemMessage = {
+                    mode: 'append',
+                    content: systemMessage.trim()
+                };
+            }
+
+            // Create session with the SDK
+            this.session = await this.client!.createSession(sessionConfig);
 
             // Subscribe to session events
             this.session.on(this.handleEvent.bind(this));
 
-            // Store current model
+            // Store current model and system message
             this.currentModel = model;
+            this.currentSystemMessage = systemMessage;
 
-            console.log(`[CopilotService] Session created with model: ${model}`);
+            console.log(`[CopilotService] Session created with model: ${model}${systemMessage ? ', with custom system message' : ''}`);
         } catch (error) {
             console.error('[CopilotService] Failed to create session:', error);
             throw error;
@@ -403,10 +418,11 @@ export class CopilotService {
     /**
      * Sends a message to the AI
      */
-    async sendMessage(prompt: string, modelId: string, attachments: FileAttachment[]): Promise<void> {
-        // Ensure session exists with correct model
-        if (!this.session) {
-            await this.createSession(modelId);
+    async sendMessage(prompt: string, modelId: string, attachments: FileAttachment[], systemMessage?: string): Promise<void> {
+        // Check if we need a new session (no session, or system message changed)
+        const systemMessageChanged = this.currentSystemMessage !== systemMessage;
+        if (!this.session || systemMessageChanged) {
+            await this.createSession(modelId, systemMessage);
         }
 
         // Generate message ID for tracking

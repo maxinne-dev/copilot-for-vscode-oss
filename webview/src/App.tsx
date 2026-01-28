@@ -27,6 +27,7 @@ function App() {
     const [sessionsLoading, setSessionsLoading] = useState(false);
     const [shouldHonorClearHistory, setShouldHonorClearHistory] = useState(true);
     const [contextUsage, setContextUsage] = useState<ContextUsageInfo | null>(null);
+    const [customSystemMessage, setCustomSystemMessage] = useState('');
 
     // Restore state from webview persistence
     useEffect(() => {
@@ -267,7 +268,8 @@ function App() {
             type: 'sendMessage',
             message: content,
             modelId: selectedModelId,
-            attachments: messageAttachments
+            attachments: messageAttachments,
+            systemMessage: customSystemMessage || undefined
         });
         setAttachments([]);
     };
@@ -318,6 +320,10 @@ function App() {
         // Will switch to chat view and model will be updated when sessionResumed message is received
     };
 
+    const handleSystemMessageChange = (message: string) => {
+        setCustomSystemMessage(message);
+    };
+
     if (isBlocked) {
         return <AccessDeniedScreen />;
     }
@@ -347,6 +353,8 @@ function App() {
             onNewChat={handleNewChat}
             onShowHistory={handleShowHistory}
             onSelectSession={handleSelectSession}
+            customSystemMessage={customSystemMessage}
+            onSystemMessageChange={handleSystemMessageChange}
         />
     );
 }

@@ -6,21 +6,25 @@ import './InputArea.css';
 interface InputAreaProps {
     attachments: FileAttachment[];
     isGenerating: boolean;
+    hasMessages: boolean;
     onSend: (content: string) => void;
     onStop: () => void;
     onAttach: () => void;
     onAttachFolder: () => void;
     onRemoveAttachment: (path: string) => void;
+    onSystemMessageClick: () => void;
 }
 
 export default function InputArea({
     attachments,
     isGenerating,
+    hasMessages,
     onSend,
     onStop,
     onAttach,
     onAttachFolder,
-    onRemoveAttachment
+    onRemoveAttachment,
+    onSystemMessageClick
 }: InputAreaProps) {
     const [input, setInput] = useState('');
     const [showAttachDropdown, setShowAttachDropdown] = useState(false);
@@ -110,16 +114,15 @@ export default function InputArea({
                 />
 
                 <div className="input-actions">
-                    {/* Attach directory button - commented out as per requirement
+                    {/* System message button - only enabled for new sessions */}
                     <button
                         className="attach-button"
-                        onClick={onAttachFolder}
-                        title="Attach folder"
-                        disabled={isGenerating}
+                        onClick={onSystemMessageClick}
+                        title={hasMessages ? "System message can only be set before starting a chat" : "Custom system message"}
+                        disabled={isGenerating || hasMessages}
                     >
-                        <i className="codicon codicon-folder"></i>
+                        <i className="codicon codicon-comment-discussion-sparkle"></i>
                     </button>
-                    */}
 
                     <div className="attach-dropdown-container" ref={attachDropdownRef}>
                         <button

@@ -1,0 +1,97 @@
+.system-message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.system-message-modal {
+    background: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-widget-border);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.system-message-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--vscode-widget-border);
+}
+
+.system-message-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vscode-foreground);
+}
+
+.system-message-body {
+    padding: 16px;
+}
+
+.system-message-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 10px 12px;
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 6px;
+    color: var(--vscode-input-foreground);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.system-message-textarea:focus {
+    border-color: var(--vscode-focusBorder);
+}
+
+.system-message-textarea::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+}
+
+.system-message-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--vscode-widget-border);
+}
+
+.modal-button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.modal-button.cancel {
+    background: transparent;
+    color: var(--vscode-foreground);
+    border: 1px solid var(--vscode-button-secondaryBackground, var(--vscode-widget-border));
+}
+
+.modal-button.cancel:hover {
+    background: var(--vscode-toolbar-hoverBackground);
+}
+
+.modal-button.apply {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+}
+
+.modal-button.apply:hover {
+    background: var(--vscode-button-hoverBackground);
+}

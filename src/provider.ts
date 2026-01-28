@@ -71,7 +71,8 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
                 await this._handleUserMessage(
                     message.message,
                     message.modelId,
-                    message.attachments
+                    message.attachments,
+                    message.systemMessage
                 );
                 break;
 
@@ -160,14 +161,15 @@ export class AIChatViewProvider implements vscode.WebviewViewProvider {
     private async _handleUserMessage(
         content: string,
         modelId: string,
-        attachments: FileAttachment[]
+        attachments: FileAttachment[],
+        systemMessage?: string
     ): Promise<void> {
         try {
             // User message is already added locally in the webview
             // No need to send it back via addMessage
 
             // Send to Copilot service
-            await this._copilotService.sendMessage(content, modelId, attachments);
+            await this._copilotService.sendMessage(content, modelId, attachments, systemMessage);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             this._sendMessage({
