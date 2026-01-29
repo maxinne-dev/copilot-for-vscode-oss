@@ -3,7 +3,7 @@
   "displayName": "Copilot for VSCode OSS",
   "description": "Copilot for VSCode OSS using GitHub Copilot SDK integration",
   "version": "1.0.0",
-  "publisher": "maxie.homri.ch",
+  "publisher": "maxie-homrich",
   "author": {
     "name": "Maxie Homrich",
     "url": "https://github.com/maxinne-dev"
