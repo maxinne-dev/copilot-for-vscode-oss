@@ -2,7 +2,8 @@
   "name": "copilot-for-vscode-oss",
   "displayName": "Copilot for VSCode OSS",
   "description": "Copilot for VSCode OSS using GitHub Copilot SDK integration",
-  "version": "1.0.0",
+  "icon": "static/icon.png",
+  "version": "1.0.1",
   "publisher": "maxie-homrich",
   "author": {
     "name": "Maxie Homrich",
